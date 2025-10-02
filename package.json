@@ -1,7 +1,7 @@
 {
-  "name": "terraform-aws-network-foundation",
+  "name": "terraform-aws-observe-example",
   "version": "1.0.0",
-  "description": "AWS Network Foundation - VPC, subnets, NAT gateways, and interface endpoints for foundational networking infrastructure",
+  "description": "Example Terraform setup for connecting AWS services to Observe (initially focused on CloudWatch Logs and S3)",
   "author": "Richard Lee",
   "scripts": {
     "lint-staged": "lint-staged",

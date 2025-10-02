@@ -21,10 +21,5 @@ module "networking" {
     vpc_enable_dns_hostnames = true
   }
 
-  interface_endpoints_config = {
-    name                       = "${local.resource_prefix}-interface-endpoints"
-    enable_ssm_session_manager = true
-  }
-
   region = local.region
 }
