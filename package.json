@@ -1,0 +1,25 @@
+{
+  "name": "terraform-aws-network-foundation",
+  "version": "1.0.0",
+  "description": "AWS Network Foundation - VPC, subnets, NAT gateways, and interface endpoints for foundational networking infrastructure",
+  "author": "Richard Lee",
+  "scripts": {
+    "lint-staged": "lint-staged",
+    "checkov": "./scripts/run-checkov.sh",
+    "terraform:fmt": "node scripts/terraform-multi-fmt.js",
+    "terraform:docs": "./scripts/update-terraform-docs.sh"
+  },
+  "lint-staged": {
+    "**/*.{tf,tfvars}": [
+      "node scripts/terraform-multi-fmt.js",
+      "./scripts/update-terraform-docs.sh"
+    ]
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.8.1",
+    "@commitlint/config-conventional": "19.8.1",
+    "husky": "9.1.7",
+    "lint-staged": "15.5.2",
+    "prettier": "3.5.3"
+  }
+}

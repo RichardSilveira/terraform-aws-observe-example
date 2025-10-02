@@ -1,0 +1,19 @@
+{
+  "editor.formatOnSave": true,
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
+  },
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "chat.tools.terminal.autoApprove": {
+    "terraform apply": false,
+    "terraform init": true,
+    "terraform validate": true,
+    "terraform plan": true,
+    "rm": true,
+    "awk": true,
+    "print": true,
+    "find": true,
+    "cd": true,
+  }
+}

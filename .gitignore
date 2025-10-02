@@ -1,0 +1,32 @@
+# Node.js / NPM (for development tools)
+.husky/*
+!.husky/pre-commit
+!.husky/commit-msg
+node_modules
+package-lock.json
+
+# Terraform
+**/.terraform/*
+iac/backend.tf
+
+*.tfstate
+*.tfstate.*
+*.tfvars
+iac/.terraform.lock.hcl
+iac/*.zip
+iac/terraform.local.plan
+iac/plan.txt
+iac/tfplan
+
+# macOS
+.DS_Store
+
+# General
+todos.txt
+notes.txt
+*.log
+.env
+.env.local
+
+# Backup files
+*.bak
