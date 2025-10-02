@@ -1,0 +1,22 @@
+# ‼️ File used as an example for local.auto.tfvars in case we run it locally for testing purposes.
+
+# -------------------------------------------------------------------
+# AWS Provider Configuration
+# -------------------------------------------------------------------
+aws_region  = "<region>"
+aws_profile = "<profile_name>"
+
+# -------------------------------------------------------------------
+# Project Metadata
+# -------------------------------------------------------------------
+owner       = "<email@domain.com>"
+cost_center = "<cost_center, e.g., DEMO>"
+project     = "<project_name>"
+environment = "<env>"
+created_by  = "arn:aws:iam::103881053461:user/<profile_nam>"
+
+# -------------------------------------------------------------------
+# Project Configuration
+# -------------------------------------------------------------------
+
+# Project-specific variables can be added here
