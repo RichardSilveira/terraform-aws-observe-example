@@ -36,3 +36,27 @@ variable "aws_profile" {
   default     = null
 }
 
+# --------------------------------------------------
+# Observe Platform Variables
+# --------------------------------------------------
+variable "observe_customer" {
+  description = "Observe Customer ID"
+  type        = string
+}
+
+variable "observe_collection_endpoint" {
+  description = "Observe collection endpoint, e.g. https://123456789012.collect.observeinc.com (us-west-2) or https://123456789012.collect.us-east-1.observeinc.com per Observe docs"
+  type        = string
+}
+
+variable "observe_token" {
+  description = "Observe authentication token"
+  type        = string
+  sensitive   = true
+}
+
+variable "cloudwatch_log_retention_days" {
+  description = "CloudWatch Logs retention period in days"
+  type        = number
+  default     = null
+}

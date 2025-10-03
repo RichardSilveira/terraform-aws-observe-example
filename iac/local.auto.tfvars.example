@@ -16,6 +16,14 @@ environment = "<env>"
 created_by  = "arn:aws:iam::103881053461:user/<profile_nam>"
 
 # -------------------------------------------------------------------
+# Observe Platform Configuration
+# -------------------------------------------------------------------
+observe_customer            = "123456789012"
+observe_collection_endpoint = "https://123456789012.collect.observeinc.com"
+observe_token               = "<your_observe_token>"
+
+
+# -------------------------------------------------------------------
 # Project Configuration
 # -------------------------------------------------------------------
 
