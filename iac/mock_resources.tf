@@ -47,20 +47,20 @@ resource "aws_iam_role_policy_attachment" "mock_lambda_basic" {
 }
 
 resource "aws_cloudwatch_log_group" "mock_app_lambda" {
-  name              = "/aws/lambda/${aws_lambda_function.mock_app.function_name}"
-  retention_in_days = local.cloudwatch_log_retention_days
+  name = "/aws/lambda/${aws_lambda_function.mock_app.function_name}"
 
   tags = local.default_tags
 }
 
-# CloudWatch Logs Subscription Filter to forward logs to Observe
+# CloudWatch Logs subscription filter (same-account) sending directly to Firehose
+# For cross-account or org-level aggregation, use a CloudWatch Logs Destination instead.
 resource "aws_cloudwatch_log_subscription_filter" "mock_lambda_to_observe" {
-  name            = "${local.resource_prefix}-mock-lambda-to-observe"
-  log_group_name  = aws_cloudwatch_log_group.mock_app_lambda.name
-  filter_pattern  = "" # Forward all logs
-  destination_arn = aws_cloudwatch_log_destination.to_firehose.arn
+  name           = "${local.resource_prefix}-mock-lambda-to-observe"
+  log_group_name = aws_cloudwatch_log_group.mock_app_lambda.name
+  filter_pattern = "" # Forward all logs
 
-  depends_on = [aws_cloudwatch_log_destination_policy.to_firehose]
+  destination_arn = module.observe_kinesis_firehose.firehose_delivery_stream.arn
+  role_arn        = aws_iam_role.cwl_direct_to_firehose.arn
 }
 
 # Create a mock Lambda ZIP file with realistic logging
@@ -129,46 +129,76 @@ EOF
   }
 }
 
-# todo - Instead of a data storage workload, I want to simulate log entries (e.g., application logs) but I'm not sure how to do that. I want the simplest possible thing that generates logs that can be forwarded to Observe. Ex. Maybe you could simply generate log files (mock) and store them in a file here that will upload a few once I run terraform apply
-
 # --------------------------------------------------
-# Mock S3 Bucket (simulating data storage workload)
+# Mock S3 Log Storage and Generation
 # --------------------------------------------------
-# This S3 bucket simulates a real data storage workload that might exist
-# in production. It represents typical data sources that could be monitored.
+# This system generates sample log files and uploads them to S3
+# to simulate real application logs that could be processed by Observe
 
-resource "aws_s3_bucket" "mock_data_storage" {
-  bucket = "${local.resource_prefix}-mock-data-storage"
+resource "aws_s3_bucket" "mock_log_storage" {
+  bucket = "${local.resource_prefix}-mock-log-storage"
   tags   = local.default_tags
 }
 
-# todo - review all comments as this one from below that explain the purpose of the resource that are obvious and remove them. Only those kind of comments.
-# Configure versioning for the mock bucket
-resource "aws_s3_bucket_versioning" "mock_data_storage" {
-  bucket = aws_s3_bucket.mock_data_storage.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-# todo - review if by default versioning is disabled. If so, remove aws_s3_bucket_versioning.mock_data_storage resource. Same for other S3 related resource blocks
-
-# Configure server-side encryption for the mock bucket
-resource "aws_s3_bucket_server_side_encryption_configuration" "mock_data_storage" {
-  bucket = aws_s3_bucket.mock_data_storage.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-# Block public access for security
-resource "aws_s3_bucket_public_access_block" "mock_data_storage" {
-  bucket = aws_s3_bucket.mock_data_storage.id
+resource "aws_s3_bucket_public_access_block" "mock_log_storage" {
+  bucket = aws_s3_bucket.mock_log_storage.id
 
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+# Generate sample application log files
+resource "local_file" "sample_app_log" {
+  content = templatefile("${path.module}/templates/sample_app.log.tpl", {
+    timestamp = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    app_name  = "mock-web-app"
+    region    = local.region
+  })
+  filename = "${path.module}/generated_logs/sample_app.log"
+}
+
+resource "local_file" "sample_error_log" {
+  content = templatefile("${path.module}/templates/sample_error.log.tpl", {
+    timestamp = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    app_name  = "mock-api-service"
+    region    = local.region
+  })
+  filename = "${path.module}/generated_logs/sample_error.log"
+}
+
+resource "local_file" "sample_access_log" {
+  content = templatefile("${path.module}/templates/sample_access.log.tpl", {
+    timestamp = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+  })
+  filename = "${path.module}/generated_logs/sample_access.log"
+}
+
+# Upload generated log files to S3
+resource "aws_s3_object" "app_log" {
+  bucket = aws_s3_bucket.mock_log_storage.id
+  key    = "application-logs/${formatdate("YYYY/MM/DD", timestamp())}/app.log"
+  source = local_file.sample_app_log.filename
+  etag   = local_file.sample_app_log.content_md5
+
+  tags = local.default_tags
+}
+
+resource "aws_s3_object" "error_log" {
+  bucket = aws_s3_bucket.mock_log_storage.id
+  key    = "error-logs/${formatdate("YYYY/MM/DD", timestamp())}/error.log"
+  source = local_file.sample_error_log.filename
+  etag   = local_file.sample_error_log.content_md5
+
+  tags = local.default_tags
+}
+
+resource "aws_s3_object" "access_log" {
+  bucket = aws_s3_bucket.mock_log_storage.id
+  key    = "access-logs/${formatdate("YYYY/MM/DD", timestamp())}/access.log"
+  source = local_file.sample_access_log.filename
+  etag   = local_file.sample_access_log.content_md5
+
+  tags = local.default_tags
 }

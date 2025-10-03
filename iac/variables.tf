@@ -44,9 +44,8 @@ variable "observe_customer" {
   type        = string
 }
 
-# todo - I believe this is needed as I'm not using us-west-2 as the region, but please confirm in the observe official documentation
 variable "observe_collection_endpoint" {
-  description = "Observe Collection Endpoint, e.g https://123456789012.collect.observeinc.com"
+  description = "Observe collection endpoint, e.g. https://123456789012.collect.observeinc.com (us-west-2) or https://123456789012.collect.us-east-1.observeinc.com per Observe docs"
   type        = string
 }
 
@@ -57,8 +56,7 @@ variable "observe_token" {
 }
 
 variable "cloudwatch_log_retention_days" {
-  description = "Retention period for CloudWatch logs in days"
+  description = "CloudWatch Logs retention period in days"
   type        = number
   default     = null
 }
-

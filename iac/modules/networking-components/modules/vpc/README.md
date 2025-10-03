@@ -5,6 +5,7 @@ This module creates a secure and highly available AWS VPC infrastructure with pu
 - Network ACLs with appropriate ingress/egress rules for both public and private subnets
 - Properly configured route tables with internet and NAT gateway routes
 - Locked-down default security group
+- Public subnets keep `map_public_ip_on_launch` disabled so instances only receive public IPs when explicitly attached
 - Support for multi-AZ deployments with optional third AZ
 - Configurable NAT gateway redundancy
 
