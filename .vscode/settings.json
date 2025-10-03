@@ -15,5 +15,7 @@
     "print": true,
     "find": true,
     "cd": true,
-  }
+    "cp": true,
+  },
+  "github.copilot.nextEditSuggestions.enabled": true
 }
