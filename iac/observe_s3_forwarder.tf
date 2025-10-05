@@ -37,7 +37,7 @@ module "observe_s3_forwarder_lambda" {
     ]
   }
 
-  tags = local.default_tags
+  # tags = local.default_tags
 }
 
 # --------------------------------------------------

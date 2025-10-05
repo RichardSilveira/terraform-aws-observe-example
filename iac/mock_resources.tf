@@ -4,25 +4,47 @@
   These resources mimic realistic scenarios for testing and demonstration.
  */
 
-# ------------------------------------------
-# Mock Lambda Function with CloudWatch Logs
-# ------------------------------------------
+# ---------------------
+# Mock Lambda Function
+# ---------------------
 
-resource "aws_lambda_function" "mock_app" {
-  filename      = "mock_lambda.zip"
-  function_name = "${local.resource_prefix}-mock-app-lambda"
-  role          = aws_iam_role.mock_lambda_execution.arn
-  handler       = "index.handler"
-  runtime       = "python3.11"
-  timeout       = 60
+resource "aws_security_group" "mock_lambda" {
+  name        = "${local.resource_prefix}-mock-lambda-sg"
+  description = "Security group for Mock Lambda"
+  vpc_id      = module.networking.vpc_id
 
-  # Create a simple dummy zip file if it doesn't exist
-  depends_on = [data.archive_file.mock_lambda_zip]
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    description      = "Allow all outbound traffic"
+  }
 
   tags = local.default_tags
 }
 
-resource "aws_iam_role" "mock_lambda_execution" {
+resource "aws_lambda_function" "mock_lambda" {
+  filename      = "mock_lambda.zip"
+  function_name = "${local.resource_prefix}-mock-lambda-function"
+  role          = aws_iam_role.mock_lambda.arn
+  handler       = "index.handler"
+  runtime       = "python3.11"
+  timeout       = 60
+
+  vpc_config {
+    subnet_ids         = module.networking.private_subnet_ids
+    security_group_ids = [aws_security_group.mock_lambda.id]
+  }
+
+  # Create a simple dummy zip file if it doesn't exist
+  depends_on = [data.archive_file.mock_lambda_zip]
+
+  # tags = local.default_tags # todo - applied via provider, review if it's needed
+}
+
+resource "aws_iam_role" "mock_lambda" {
   name = "${local.resource_prefix}-mock-lambda-execution-role"
 
   assume_role_policy = jsonencode({
@@ -38,25 +60,25 @@ resource "aws_iam_role" "mock_lambda_execution" {
     ]
   })
 
-  tags = local.default_tags
+  # tags = local.default_tags
 }
 
-resource "aws_iam_role_policy_attachment" "mock_lambda_basic" {
+resource "aws_iam_role_policy_attachment" "mock_lambda" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.mock_lambda_execution.name
+  role       = aws_iam_role.mock_lambda.name
 }
 
-resource "aws_cloudwatch_log_group" "mock_app_lambda" {
-  name = "/aws/lambda/${aws_lambda_function.mock_app.function_name}"
+resource "aws_cloudwatch_log_group" "mock_lambda" {
+  name = "/aws/lambda/${aws_lambda_function.mock_lambda.function_name}"
 
-  tags = local.default_tags
+  # tags = local.default_tags
 }
 
 # CloudWatch Logs subscription filter (same-account) sending directly to Firehose
 # For cross-account or org-level aggregation, use a CloudWatch Logs Destination instead.
 resource "aws_cloudwatch_log_subscription_filter" "mock_lambda_to_observe" {
   name           = "${local.resource_prefix}-mock-lambda-to-observe"
-  log_group_name = aws_cloudwatch_log_group.mock_app_lambda.name
+  log_group_name = aws_cloudwatch_log_group.mock_lambda.name
   filter_pattern = "" # Forward all logs
 
   destination_arn = module.observe_kinesis_firehose.firehose_delivery_stream.arn
@@ -137,7 +159,7 @@ EOF
 
 resource "aws_s3_bucket" "mock_log_storage" {
   bucket = "${local.resource_prefix}-mock-log-storage"
-  tags   = local.default_tags
+  # tags   = local.default_tags
 }
 
 resource "aws_s3_bucket_public_access_block" "mock_log_storage" {

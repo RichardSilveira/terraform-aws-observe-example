@@ -16,7 +16,7 @@ resource "aws_cloudwatch_log_destination" "to_firehose" {
   role_arn   = aws_iam_role.to_firehose.arn
   target_arn = module.observe_kinesis_firehose.firehose_delivery_stream.arn
 
-  tags = local.default_tags
+  # tags = local.default_tags
 }
 
 resource "aws_iam_role" "to_firehose" {
@@ -33,9 +33,8 @@ resource "aws_iam_role" "to_firehose" {
     ]
   })
 
-  tags = local.default_tags
+  # tags = local.default_tags
 }
-
 
 resource "aws_cloudwatch_log_destination_policy" "to_firehose" {
   destination_name = aws_cloudwatch_log_destination.to_firehose.name
