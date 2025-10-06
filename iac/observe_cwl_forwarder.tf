@@ -8,8 +8,6 @@
 # --------------------------------------------------
 resource "aws_s3_bucket" "observe_firehose_failed_events" {
   bucket = "${local.resource_prefix}-observe-firehose-failed-events"
-
-  tags = local.default_tags
 }
 
 resource "aws_s3_bucket_public_access_block" "observe_firehose_failed_events" {
@@ -30,6 +28,7 @@ module "observe_kinesis_firehose" {
 
   name                        = "${local.resource_prefix}-observe-firehose"
   observe_collection_endpoint = var.observe_collection_endpoint
+  observe_customer            = var.observe_customer
   observe_token               = var.observe_token
 
   iam_name_prefix = local.resource_prefix
@@ -45,8 +44,6 @@ module "observe_kinesis_firehose" {
 
 resource "aws_cloudwatch_log_group" "firehose_cwl" {
   name = format("/aws/firehose/%s", "${local.resource_prefix}-observe-firehose-cwl")
-
-  tags = local.default_tags
 }
 
 # This role allows CloudWatch Logs to put log events to the Firehose delivery stream
@@ -63,8 +60,6 @@ resource "aws_iam_role" "cwl_direct_to_firehose" {
       }
     ]
   })
-
-  tags = local.default_tags
 }
 
 resource "aws_iam_role_policy" "cwl_direct_to_firehose" {

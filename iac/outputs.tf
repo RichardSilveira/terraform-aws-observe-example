@@ -36,12 +36,12 @@ output "observe_s3_forwarder_lambda_name" {
 # --------------------------------------------------
 output "mock_lambda_function_name" {
   description = "Name of the mock Lambda function"
-  value       = aws_lambda_function.mock_app.function_name
+  value       = module.mock_lambda.function_name
 }
 
 output "mock_lambda_function_arn" {
   description = "ARN of the mock Lambda function"
-  value       = aws_lambda_function.mock_app.arn
+  value       = module.mock_lambda.function_arn
 }
 
 output "mock_s3_log_bucket_name" {

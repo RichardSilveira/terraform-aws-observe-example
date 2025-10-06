@@ -7,7 +7,8 @@
     "lint-staged": "lint-staged",
     "checkov": "./scripts/run-checkov.sh",
     "terraform:fmt": "node scripts/terraform-multi-fmt.js",
-    "terraform:docs": "./scripts/update-terraform-docs.sh"
+    "terraform:docs": "./scripts/update-terraform-docs.sh",
+    "prepare": "husky"
   },
   "lint-staged": {
     "**/*.{tf,tfvars}": [
