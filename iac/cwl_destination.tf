@@ -15,12 +15,10 @@ resource "aws_cloudwatch_log_destination" "to_firehose" {
   name       = "${local.resource_prefix}-observe-firehose-destination"
   role_arn   = aws_iam_role.to_firehose.arn
   target_arn = module.observe_kinesis_firehose.firehose_delivery_stream.arn
-
-  # tags = local.default_tags
 }
 
 resource "aws_iam_role" "to_firehose" {
-  name = "${local.resource_prefix}-cwl-direct-to-firehose-role"
+  name = "${local.resource_prefix}-destination-to-firehose-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -32,8 +30,22 @@ resource "aws_iam_role" "to_firehose" {
       }
     ]
   })
+}
 
-  # tags = local.default_tags
+
+resource "aws_iam_role_policy" "to_firehose" {
+  name = "${local.resource_prefix}-destination-to-firehose-policy"
+  role = aws_iam_role.to_firehose.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = ["firehose:PutRecord", "firehose:PutRecordBatch"],
+        Resource = module.observe_kinesis_firehose.firehose_delivery_stream.arn
+      }
+    ]
+  })
 }
 
 resource "aws_cloudwatch_log_destination_policy" "to_firehose" {
@@ -43,10 +55,15 @@ resource "aws_cloudwatch_log_destination_policy" "to_firehose" {
     Statement = [{
       Effect = "Allow",
       Principal = {
-        AWS = "arn:aws:iam::${local.account_id}:root"
+        AWS = "*"
       },
       Action   = "logs:PutSubscriptionFilter",
       Resource = aws_cloudwatch_log_destination.to_firehose.arn
+      Condition : {
+        "ForAnyValue:StringLike" : {
+          "aws:PrincipalOrgPaths" : ["o-ywdmny0x30/r-hf6b/o-ywdmny0x30/*"]
+        }
+      }
     }]
   })
 }

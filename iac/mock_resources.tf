@@ -25,64 +25,20 @@ resource "aws_security_group" "mock_lambda" {
   tags = local.default_tags
 }
 
-resource "aws_lambda_function" "mock_lambda" {
-  filename      = "mock_lambda.zip"
-  function_name = "${local.resource_prefix}-mock-lambda-function"
-  role          = aws_iam_role.mock_lambda.arn
-  handler       = "index.handler"
-  runtime       = "python3.11"
-  timeout       = 60
 
-  vpc_config {
-    subnet_ids         = module.networking.private_subnet_ids
-    security_group_ids = [aws_security_group.mock_lambda.id]
-  }
+module "mock_lambda" {
+  source          = "./modules/lambda"
+  resource_prefix = local.resource_prefix
+  function_name   = "mock-lambda-function"
+  description     = "A mock Lambda function that simulates application logs"
+  source_path     = data.archive_file.mock_lambda_zip.output_path
+  handler         = "index.handler"
+  runtime         = "python3.11"
+  timeout         = 60
+  memory_size     = 512
 
-  # Create a simple dummy zip file if it doesn't exist
-  depends_on = [data.archive_file.mock_lambda_zip]
-
-  # tags = local.default_tags # todo - applied via provider, review if it's needed
-}
-
-resource "aws_iam_role" "mock_lambda" {
-  name = "${local.resource_prefix}-mock-lambda-execution-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
-      }
-    ]
-  })
-
-  # tags = local.default_tags
-}
-
-resource "aws_iam_role_policy_attachment" "mock_lambda" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.mock_lambda.name
-}
-
-resource "aws_cloudwatch_log_group" "mock_lambda" {
-  name = "/aws/lambda/${aws_lambda_function.mock_lambda.function_name}"
-
-  # tags = local.default_tags
-}
-
-# CloudWatch Logs subscription filter (same-account) sending directly to Firehose
-# For cross-account or org-level aggregation, use a CloudWatch Logs Destination instead.
-resource "aws_cloudwatch_log_subscription_filter" "mock_lambda_to_observe" {
-  name           = "${local.resource_prefix}-mock-lambda-to-observe"
-  log_group_name = aws_cloudwatch_log_group.mock_lambda.name
-  filter_pattern = "" # Forward all logs
-
-  destination_arn = module.observe_kinesis_firehose.firehose_delivery_stream.arn
-  role_arn        = aws_iam_role.cwl_direct_to_firehose.arn
+  subnet_ids         = module.networking.private_subnet_ids
+  security_group_ids = [aws_security_group.mock_lambda.id]
 }
 
 # Create a mock Lambda ZIP file with realistic logging
@@ -179,6 +135,10 @@ resource "local_file" "sample_app_log" {
     region    = local.region
   })
   filename = "${path.module}/generated_logs/sample_app.log"
+
+  lifecycle {
+    ignore_changes = [content]
+  }
 }
 
 resource "local_file" "sample_error_log" {
@@ -188,6 +148,10 @@ resource "local_file" "sample_error_log" {
     region    = local.region
   })
   filename = "${path.module}/generated_logs/sample_error.log"
+
+  lifecycle {
+    ignore_changes = [content]
+  }
 }
 
 resource "local_file" "sample_access_log" {
@@ -195,6 +159,10 @@ resource "local_file" "sample_access_log" {
     timestamp = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
   })
   filename = "${path.module}/generated_logs/sample_access.log"
+
+  lifecycle {
+    ignore_changes = [content]
+  }
 }
 
 # Upload generated log files to S3
@@ -203,8 +171,11 @@ resource "aws_s3_object" "app_log" {
   key    = "application-logs/${formatdate("YYYY/MM/DD", timestamp())}/app.log"
   source = local_file.sample_app_log.filename
   etag   = local_file.sample_app_log.content_md5
+  tags   = local.default_tags
 
-  tags = local.default_tags
+  lifecycle {
+    ignore_changes = [source, key, etag] # remove key if you want to generate new files
+  }
 }
 
 resource "aws_s3_object" "error_log" {
@@ -212,8 +183,11 @@ resource "aws_s3_object" "error_log" {
   key    = "error-logs/${formatdate("YYYY/MM/DD", timestamp())}/error.log"
   source = local_file.sample_error_log.filename
   etag   = local_file.sample_error_log.content_md5
+  tags   = local.default_tags
 
-  tags = local.default_tags
+  lifecycle {
+    ignore_changes = [source, key, etag] # remove key if you want to generate new files
+  }
 }
 
 resource "aws_s3_object" "access_log" {
@@ -221,6 +195,9 @@ resource "aws_s3_object" "access_log" {
   key    = "access-logs/${formatdate("YYYY/MM/DD", timestamp())}/access.log"
   source = local_file.sample_access_log.filename
   etag   = local_file.sample_access_log.content_md5
+  tags   = local.default_tags
 
-  tags = local.default_tags
+  lifecycle {
+    ignore_changes = [source, key, etag] # remove key if you want to generate new files
+  }
 }

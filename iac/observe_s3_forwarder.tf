@@ -24,20 +24,13 @@ module "observe_s3_forwarder_lambda" {
   observe_token    = var.observe_token
   iam_name_prefix  = local.resource_prefix
 
-  # Tweak resources if needed (kept modest for example)
-  memory_size                    = 512
-  timeout                        = 60
-  reserved_concurrent_executions = 10
-
   # Run inside VPC private subnets for egress through NAT Gateway (networking module provides these)
   vpc_config = {
-    subnets = module.networking.private_subnet_ids
+    subnets = [for id in module.networking.private_subnet_ids : { id : id, arn : "arn:aws:ec2:${local.region}:${local.account_id}:subnet/${id}" }]
     security_groups = [
       { id = aws_security_group.observe_s3_forwarder_lambda.id }
     ]
   }
-
-  # tags = local.default_tags
 }
 
 # --------------------------------------------------
@@ -71,7 +64,5 @@ resource "aws_security_group" "observe_s3_forwarder_lambda" {
     ipv6_cidr_blocks = ["::/0"]
     description      = "Allow all outbound traffic"
   }
-
-  tags = local.default_tags
 }
 
