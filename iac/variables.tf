@@ -54,9 +54,3 @@ variable "observe_token" {
   type        = string
   sensitive   = true
 }
-
-variable "cloudwatch_log_retention_days" {
-  description = "CloudWatch Logs retention period in days"
-  type        = number
-  default     = null
-}
