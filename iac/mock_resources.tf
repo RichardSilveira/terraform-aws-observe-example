@@ -41,6 +41,17 @@ module "mock_lambda" {
   security_group_ids = [aws_security_group.mock_lambda.id]
 }
 
+# CloudWatch Logs subscription filter (same-account) sending directly to Firehose
+# For cross-account or org-level aggregation, use a CloudWatch Logs Destination instead.
+resource "aws_cloudwatch_log_subscription_filter" "mock_lambda_to_observe" {
+  name           = "${local.resource_prefix}-mock-lambda-to-observe"
+  log_group_name = module.mock_lambda.log_group_name
+  filter_pattern = "" # Forward all logs
+
+  destination_arn = module.observe_kinesis_firehose.firehose_delivery_stream.arn
+  role_arn        = aws_iam_role.cwl_direct_to_firehose.arn
+}
+
 # Create a mock Lambda ZIP file with realistic logging
 data "archive_file" "mock_lambda_zip" {
   type        = "zip"
