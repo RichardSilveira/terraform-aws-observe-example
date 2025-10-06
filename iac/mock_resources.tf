@@ -185,7 +185,7 @@ resource "aws_s3_object" "app_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [source, key, etag] # remove key if you want to generate new files
+    ignore_changes = [key] # remove key if you want to generate new files
   }
 }
 
@@ -197,7 +197,7 @@ resource "aws_s3_object" "error_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [source, key, etag] # remove key if you want to generate new files
+    ignore_changes = [key] # remove key if you want to generate new files
   }
 }
 
@@ -209,6 +209,6 @@ resource "aws_s3_object" "access_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [source, key, etag] # remove key if you want to generate new files
+    ignore_changes = [key] # remove key if you want to generate new files
   }
 }

@@ -90,6 +90,7 @@ No modules.
 | <a name="input_public_subnet_2_cidr"></a> [public\_subnet\_2\_cidr](#input\_public\_subnet\_2\_cidr) | CIDR block for the second public subnet (e.g., 10.0.2.0/24). | `string` | n/a | yes |
 | <a name="input_public_subnet_3_az"></a> [public\_subnet\_3\_az](#input\_public\_subnet\_3\_az) | Availability zone for the third public subnet (e.g., us-east-1c). | `string` | `null` | no |
 | <a name="input_public_subnet_3_cidr"></a> [public\_subnet\_3\_cidr](#input\_public\_subnet\_3\_cidr) | CIDR block for the third public subnet (e.g., 10.0.3.0/24). | `string` | `null` | no |
+| <a name="input_region"></a> [region](#input\_region) | AWS region for VPC endpoints. | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources. | `map(string)` | `{}` | no |
 | <a name="input_vpc_enable_dns_hostnames"></a> [vpc\_enable\_dns\_hostnames](#input\_vpc\_enable\_dns\_hostnames) | Enable DNS hostnames in the VPC. | `bool` | `true` | no |
 
@@ -103,5 +104,6 @@ No modules.
 | <a name="output_private_subnet_ids"></a> [private\_subnet\_ids](#output\_private\_subnet\_ids) | The IDs of the private subnets. |
 | <a name="output_public_nacl_id"></a> [public\_nacl\_id](#output\_public\_nacl\_id) | The ID of the public Network ACL. |
 | <a name="output_public_subnet_ids"></a> [public\_subnet\_ids](#output\_public\_subnet\_ids) | The IDs of the public subnets. |
+| <a name="output_vpc_cidr_block"></a> [vpc\_cidr\_block](#output\_vpc\_cidr\_block) | The CIDR block of the VPC. |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC. |
 <!-- END_TF_DOCS -->
