@@ -7,7 +7,7 @@
 # S3 Bucket for Firehose failed events
 # --------------------------------------------------
 resource "aws_s3_bucket" "observe_firehose_failed_events" {
-  bucket = "${local.resource_prefix}-observe-firehose-failed-events"
+  bucket = "${local.resource_prefix}-firehose-failed-events"
 }
 
 resource "aws_s3_bucket_public_access_block" "observe_firehose_failed_events" {

@@ -34,6 +34,22 @@ provider "aws" {
   }
 }
 
+# provider "aws" {
+#   region  = "us-west-2"
+#   alias   = "us_west_2" # Needed for Observe Filedrop free tier accounts
+#   profile = var.aws_profile
+
+#   default_tags {
+#     tags = {
+#       Owner            = var.owner
+#       CostCenter       = var.cost_center
+#       Project          = var.project
+#       Environment      = var.environment
+#       "user:CreatedBy" = var.created_by
+#     }
+#   }
+# }
+
 provider "observe" {
   customer = var.observe_customer
 

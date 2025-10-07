@@ -22,9 +22,7 @@ observe_customer            = "123456789012"
 observe_collection_endpoint = "https://123456789012.collect.observeinc.com"
 observe_token               = "<your_observe_token>"
 
-
-# -------------------------------------------------------------------
-# Project Configuration
-# -------------------------------------------------------------------
-
-# Project-specific variables can be added here
+ # Optional, only if using S3 Access Point for Filedrop - https://docs.observeinc.com/en/latest/content/data-ingestion/sources/amazon-s3.html
+observe_filedrop_access_point_arn = "TBD"
+observe_filedrop_bucket        = "TBD"
+observe_filedrop_bucket_prefix = "TBD"

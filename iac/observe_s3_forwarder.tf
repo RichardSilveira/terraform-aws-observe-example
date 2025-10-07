@@ -19,7 +19,7 @@ module "observe_s3_forwarder_lambda" {
   source  = "observeinc/lambda/aws"
   version = "3.6.0"
 
-  name             = "${local.resource_prefix}-observe-s3-forwarder"
+  name             = "${local.resource_prefix}-s3-forwarder"
   observe_customer = var.observe_customer
   observe_token    = var.observe_token
   iam_name_prefix  = local.resource_prefix

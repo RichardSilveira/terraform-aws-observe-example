@@ -125,8 +125,7 @@ EOF
 # to simulate real application logs that could be processed by Observe
 
 resource "aws_s3_bucket" "mock_log_storage" {
-  bucket = "${local.resource_prefix}-mock-log-storage"
-  # tags   = local.default_tags
+  bucket = "${local.resource_prefix}-mock-log-storage-s3"
 }
 
 resource "aws_s3_bucket_public_access_block" "mock_log_storage" {
@@ -185,7 +184,7 @@ resource "aws_s3_object" "app_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key] # remove key if you want to generate new files
+    ignore_changes = [key] # comment it if you want to update the files
   }
 }
 
@@ -197,7 +196,7 @@ resource "aws_s3_object" "error_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key] # remove key if you want to generate new files
+    ignore_changes = [key] # comment it if you want to update the files
   }
 }
 
@@ -209,6 +208,6 @@ resource "aws_s3_object" "access_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key] # remove key if you want to generate new files
+    ignore_changes = [key] # comment it if you want to update the files
   }
 }

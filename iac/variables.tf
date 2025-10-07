@@ -54,3 +54,21 @@ variable "observe_token" {
   type        = string
   sensitive   = true
 }
+
+variable "observe_filedrop_access_point_arn" {
+  description = "Observe Filedrop S3 Access Point ARN"
+  type        = string
+  default     = ""
+}
+
+variable "observe_filedrop_bucket" {
+  description = "Observe Filedrop S3 bucket name"
+  type        = string
+  default     = ""
+}
+
+variable "observe_filedrop_bucket_prefix" {
+  description = "Observe Filedrop S3 bucket prefix"
+  type        = string
+  default     = ""
+}

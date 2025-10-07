@@ -22,6 +22,7 @@
 |------|--------|---------|
 | <a name="module_mock_lambda"></a> [mock\_lambda](#module\_mock\_lambda) | ./modules/lambda | n/a |
 | <a name="module_networking"></a> [networking](#module\_networking) | ./modules/networking-components | n/a |
+| <a name="module_observe_filedrop"></a> [observe\_filedrop](#module\_observe\_filedrop) | observeinc/collection/aws//modules/forwarder | >= 2.10 |
 | <a name="module_observe_kinesis_firehose"></a> [observe\_kinesis\_firehose](#module\_observe\_kinesis\_firehose) | observeinc/kinesis-firehose/aws | 2.4.1 |
 | <a name="module_observe_s3_bucket_subscription"></a> [observe\_s3\_bucket\_subscription](#module\_observe\_s3\_bucket\_subscription) | observeinc/lambda/aws//modules/s3_bucket_subscription | 3.6.0 |
 | <a name="module_observe_s3_forwarder_lambda"></a> [observe\_s3\_forwarder\_lambda](#module\_observe\_s3\_forwarder\_lambda) | observeinc/lambda/aws | 3.6.0 |
@@ -39,17 +40,26 @@
 | [aws_iam_role_policy.cwl_direct_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy.to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_s3_bucket.mock_log_storage](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
+| [aws_s3_bucket.mock_log_storage_filedrop](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
 | [aws_s3_bucket.observe_firehose_failed_events](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
+| [aws_s3_bucket_notification.to_sqs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_notification) | resource |
 | [aws_s3_bucket_public_access_block.mock_log_storage](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
+| [aws_s3_bucket_public_access_block.mock_log_storage_filedrop](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
 | [aws_s3_bucket_public_access_block.observe_firehose_failed_events](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
 | [aws_s3_object.access_log](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) | resource |
+| [aws_s3_object.access_log_filedrop](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) | resource |
 | [aws_s3_object.app_log](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) | resource |
+| [aws_s3_object.app_log_filedrop](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) | resource |
 | [aws_s3_object.error_log](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) | resource |
+| [aws_s3_object.error_log_filedrop](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) | resource |
 | [aws_security_group.mock_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.observe_s3_forwarder_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [local_file.sample_access_log](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
+| [local_file.sample_access_log_filedrop](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [local_file.sample_app_log](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
+| [local_file.sample_app_log_filedrop](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [local_file.sample_error_log](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
+| [local_file.sample_error_log_filedrop](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [archive_file.mock_lambda_zip](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
@@ -65,6 +75,9 @@
 | <a name="input_environment"></a> [environment](#input\_environment) | The environment for the resources (e.g., dev, staging, prod). | `string` | n/a | yes |
 | <a name="input_observe_collection_endpoint"></a> [observe\_collection\_endpoint](#input\_observe\_collection\_endpoint) | Observe collection endpoint, e.g. https://123456789012.collect.observeinc.com (us-west-2) or https://123456789012.collect.us-east-1.observeinc.com per Observe docs | `string` | n/a | yes |
 | <a name="input_observe_customer"></a> [observe\_customer](#input\_observe\_customer) | Observe Customer ID | `string` | n/a | yes |
+| <a name="input_observe_filedrop_access_point_arn"></a> [observe\_filedrop\_access\_point\_arn](#input\_observe\_filedrop\_access\_point\_arn) | Observe Filedrop S3 Access Point ARN | `string` | `""` | no |
+| <a name="input_observe_filedrop_bucket"></a> [observe\_filedrop\_bucket](#input\_observe\_filedrop\_bucket) | Observe Filedrop S3 bucket name | `string` | `""` | no |
+| <a name="input_observe_filedrop_bucket_prefix"></a> [observe\_filedrop\_bucket\_prefix](#input\_observe\_filedrop\_bucket\_prefix) | Observe Filedrop S3 bucket prefix | `string` | `""` | no |
 | <a name="input_observe_token"></a> [observe\_token](#input\_observe\_token) | Observe authentication token | `string` | n/a | yes |
 | <a name="input_owner"></a> [owner](#input\_owner) | The owner of the resources. | `string` | n/a | yes |
 | <a name="input_project"></a> [project](#input\_project) | The project name for the resources. | `string` | n/a | yes |
