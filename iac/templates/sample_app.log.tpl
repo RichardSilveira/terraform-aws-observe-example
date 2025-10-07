@@ -1,8 +1,3 @@
-# Sample Application Logs
-# Generated at: ${timestamp}
-# Application: ${app_name}
-# Region: ${region}
-
 ${timestamp} INFO  [main] Starting ${app_name} application
 ${timestamp} INFO  [http-nio-8080-exec-1] User authentication successful for user: john.doe@example.com
 ${timestamp} DEBUG [service-pool-1] Processing order #12345 for customer ID: cust-789

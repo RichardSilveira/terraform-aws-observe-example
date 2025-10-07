@@ -1,8 +1,3 @@
-# Sample Error Logs
-# Generated at: ${timestamp}
-# Application: ${app_name}
-# Region: ${region}
-
 ${timestamp} ERROR [http-nio-8080-exec-3] Authentication failed for user: hacker@malicious.com - Invalid credentials
 ${timestamp} WARN  [service-pool-1] Rate limit exceeded for IP: 192.168.1.100, requests blocked
 ${timestamp} ERROR [database-pool-1] Connection timeout to database cluster after 30s

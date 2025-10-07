@@ -27,39 +27,29 @@ resource "aws_s3_bucket_public_access_block" "mock_log_storage_filedrop" {
 # Generate sample application log files
 resource "local_file" "sample_app_log_filedrop" {
   content = templatefile("${path.module}/templates/sample_app.log.tpl", {
-    timestamp = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    timestamp = local.static_log_timestamp
     app_name  = "mock-web-app"
     region    = local.region
   })
   filename = "${path.module}/generated_logs/sample_app.log"
-
-  lifecycle {
-    ignore_changes = [content]
-  }
 }
 
 resource "local_file" "sample_error_log_filedrop" {
   content = templatefile("${path.module}/templates/sample_error.log.tpl", {
-    timestamp = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    timestamp = local.static_log_timestamp
     app_name  = "mock-api-service"
     region    = local.region
   })
   filename = "${path.module}/generated_logs/sample_error.log"
-
-  lifecycle {
-    ignore_changes = [content]
-  }
 }
 
 resource "local_file" "sample_access_log_filedrop" {
   content = templatefile("${path.module}/templates/sample_access.log.tpl", {
-    timestamp = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    timestamp = local.static_log_timestamp
+    app_name  = "mock-api-service"
+    region    = local.region
   })
   filename = "${path.module}/generated_logs/sample_access.log"
-
-  lifecycle {
-    ignore_changes = [content]
-  }
 }
 
 # Upload generated log files to S3
@@ -71,7 +61,7 @@ resource "aws_s3_object" "app_log_filedrop" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key] # comment it if you want to update the files
+    ignore_changes = [key, etag] # comment it if you want to update the files
   }
 }
 
@@ -83,7 +73,7 @@ resource "aws_s3_object" "error_log_filedrop" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key] # comment it if you want to update the files
+    ignore_changes = [key, etag] # comment it if you want to update the files
   }
 }
 
@@ -95,6 +85,6 @@ resource "aws_s3_object" "access_log_filedrop" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key] # comment it if you want to update the files
+    ignore_changes = [key, etag] # comment it if you want to update the files
   }
 }
