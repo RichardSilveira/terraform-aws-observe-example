@@ -74,4 +74,3 @@ resource "aws_s3_bucket_notification" "to_sqs" {
     events    = ["s3:ObjectCreated:*"]
   }
 }
-

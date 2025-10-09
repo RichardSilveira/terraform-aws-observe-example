@@ -137,6 +137,11 @@ resource "aws_s3_bucket_public_access_block" "mock_log_storage" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_notification" "mock_log_storage" {
+  bucket      = aws_s3_bucket.mock_log_storage.id
+  eventbridge = true
+}
+
 # Generate sample application log files
 resource "local_file" "sample_app_log" {
   content = templatefile("${path.module}/templates/sample_app.log.tpl", {
@@ -174,7 +179,7 @@ resource "aws_s3_object" "app_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key, etag] # comment it if you want to update the files
+    # ignore_changes = [key, etag] # comment it if you want to update the files
   }
 }
 
@@ -186,7 +191,7 @@ resource "aws_s3_object" "error_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key, etag] # comment it if you want to update the files
+    # ignore_changes = [key, etag] # comment it if you want to update the files
   }
 }
 
@@ -198,6 +203,6 @@ resource "aws_s3_object" "access_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key, etag] # comment it if you want to update the files
+    # ignore_changes = [key, etag] # comment it if you want to update the files
   }
 }

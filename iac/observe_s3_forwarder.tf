@@ -38,13 +38,44 @@ module "observe_s3_forwarder_lambda" {
 # --------------------------------------------------
 # Attach the forwarder Lambda to one or more S3 buckets. For the example we use
 # the mock log storage bucket that is populated with sample log files.
-module "observe_s3_bucket_subscription" {
-  source  = "observeinc/lambda/aws//modules/s3_bucket_subscription"
-  version = "3.6.0"
 
-  lambda          = module.observe_s3_forwarder_lambda.lambda_function
-  bucket_arns     = [aws_s3_bucket.mock_log_storage.arn]
-  iam_name_prefix = local.resource_prefix
+/* 🧙‍♂️ Observe recommends subscribe the Lambda directly in the S3 for the sake of simplicity,
+    but you can also use EventBridge rules, which is better for cross-account scenarios, plus,
+    in case you already have any event notification configured in the bucket, to avoid conflicts.
+*/
+# module "observe_s3_bucket_subscription" {
+#   source  = "observeinc/lambda/aws//modules/s3_bucket_subscription"
+#   version = "3.6.0"
+
+#   lambda          = module.observe_s3_forwarder_lambda.lambda_function
+#   bucket_arns     = [aws_s3_bucket.mock_log_storage.arn]
+#   iam_name_prefix = local.resource_prefix
+# }
+
+resource "aws_cloudwatch_event_rule" "s3_object_created" {
+  name        = "${local.resource_prefix}-s3-object-created-to-observe"
+  description = "Route S3 Object Created events to the Observe lambda"
+  event_pattern = jsonencode({
+    "source" : ["aws.s3"],
+    "detail-type" : ["Object Created"],
+    "detail" : {
+      "bucket" : { "name" : ["${aws_s3_bucket.mock_log_storage.bucket}"] },
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "to_observe_lambda" {
+  rule      = aws_cloudwatch_event_rule.s3_object_created.name
+  target_id = "${local.resource_prefix}-observe-lambda"
+  arn       = module.observe_s3_forwarder_lambda.lambda_function.arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = module.observe_s3_forwarder_lambda.lambda_function.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.s3_object_created.arn
 }
 
 # --------------------------------------------------
