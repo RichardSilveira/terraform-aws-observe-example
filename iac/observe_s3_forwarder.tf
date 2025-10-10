@@ -68,6 +68,61 @@ resource "aws_cloudwatch_event_target" "to_observe_lambda" {
   rule      = aws_cloudwatch_event_rule.s3_object_created.name
   target_id = "${local.resource_prefix}-observe-lambda"
   arn       = module.observe_s3_forwarder_lambda.lambda_function.arn
+
+  # Transform EventBridge S3 event -> classic S3 notification shape
+  input_transformer {
+    input_paths = {
+      bucket    = "$.detail.bucket.name"
+      key       = "$.detail.object.key"
+      size      = "$.detail.object.size"
+      etag      = "$.detail.object.etag"
+      sequencer = "$.detail.object.sequencer"
+      region    = "$.region"
+      time      = "$.time"
+    }
+
+    # Standard S3 notification envelope matching what S3 directly sends
+    input_template = <<EOT
+{
+  "Records": [
+    {
+      "eventVersion": "2.1",
+      "eventSource": "aws:s3",
+      "awsRegion": "<region>",
+      "eventTime": "<time>",
+      "eventName": "ObjectCreated:Put",
+      "userIdentity": {
+        "principalId": "AWS:AIDAI"
+      },
+      "requestParameters": {
+        "sourceIPAddress": "0.0.0.0"
+      },
+      "responseElements": {
+        "x-amz-request-id": "EXAMPLE",
+        "x-amz-id-2": "EXAMPLE"
+      },
+      "s3": {
+        "s3SchemaVersion": "1.0",
+        "configurationId": "eventbridge-s3-event",
+        "bucket": {
+          "name": "<bucket>",
+          "ownerIdentity": {
+            "principalId": "EXAMPLE"
+          },
+          "arn": "arn:aws:s3:::<bucket>"
+        },
+        "object": {
+          "key": "<key>",
+          "size": <size>,
+          "eTag": "<etag>",
+          "sequencer": "<sequencer>"
+        }
+      }
+    }
+  ]
+}
+EOT
+  }
 }
 
 resource "aws_lambda_permission" "allow_eventbridge" {
@@ -76,6 +131,36 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   function_name = module.observe_s3_forwarder_lambda.lambda_function.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.s3_object_created.arn
+}
+
+data "aws_iam_policy_document" "s3_read" {
+
+  # (note from observe): `s3:ListBucket` is not strictly required, but it allows us to receive a 404
+  # instead of 403 error if an S3 object no longer exists by the time our
+  # lambda function tries to retrieve it
+  statement {
+    sid       = "ListBuckets"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.mock_log_storage.arn]
+  }
+
+  statement {
+    sid       = "GetObjects"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.mock_log_storage.arn}/*"]
+  }
+}
+
+resource "aws_iam_policy" "s3_bucket_read" {
+  name   = "${local.resource_prefix}-s3-bucket-read"
+  policy = data.aws_iam_policy_document.s3_read.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_s3_bucket_read" {
+  role       = element(split("/", module.observe_s3_forwarder_lambda.lambda_function.role), 1)
+  policy_arn = aws_iam_policy.s3_bucket_read.arn
 }
 
 # --------------------------------------------------

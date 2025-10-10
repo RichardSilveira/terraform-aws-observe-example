@@ -15,3 +15,4 @@ locals {
     "user:CreatedBy" = var.created_by
   }
 }
+
