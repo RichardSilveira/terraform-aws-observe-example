@@ -14,6 +14,7 @@ iac/backend.tf
 *.tfvars
 iac/.terraform.lock.hcl
 iac/*.zip
+iac/builds/
 iac/terraform.local.plan
 iac/tfplan.txt
 iac/tfplan

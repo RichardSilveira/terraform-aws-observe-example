@@ -60,6 +60,7 @@ resource "aws_cloudwatch_event_rule" "s3_object_created" {
     "detail-type" : ["Object Created"],
     "detail" : {
       "bucket" : { "name" : ["${aws_s3_bucket.mock_log_storage.bucket}"] },
+      "object" : { "key" : [{ "prefix" : "observe/" }] }
     }
   })
 }
@@ -68,6 +69,10 @@ resource "aws_cloudwatch_event_target" "to_observe_lambda" {
   rule      = aws_cloudwatch_event_rule.s3_object_created.name
   target_id = "${local.resource_prefix}-observe-lambda"
   arn       = module.observe_s3_forwarder_lambda.lambda_function.arn
+
+  dead_letter_config {
+    arn = aws_sqs_queue.eventbridge_dlq.arn
+  }
 
   # Transform EventBridge S3 event -> classic S3 notification shape
   input_transformer {
@@ -81,7 +86,7 @@ resource "aws_cloudwatch_event_target" "to_observe_lambda" {
       time      = "$.time"
     }
 
-    # Standard S3 notification envelope matching what S3 directly sends
+    # Minimal S3 notification envelope
     input_template = <<EOT
 {
   "Records": [
@@ -91,24 +96,10 @@ resource "aws_cloudwatch_event_target" "to_observe_lambda" {
       "awsRegion": "<region>",
       "eventTime": "<time>",
       "eventName": "ObjectCreated:Put",
-      "userIdentity": {
-        "principalId": "AWS:AIDAI"
-      },
-      "requestParameters": {
-        "sourceIPAddress": "0.0.0.0"
-      },
-      "responseElements": {
-        "x-amz-request-id": "EXAMPLE",
-        "x-amz-id-2": "EXAMPLE"
-      },
       "s3": {
         "s3SchemaVersion": "1.0",
-        "configurationId": "eventbridge-s3-event",
         "bucket": {
           "name": "<bucket>",
-          "ownerIdentity": {
-            "principalId": "EXAMPLE"
-          },
           "arn": "arn:aws:s3:::<bucket>"
         },
         "object": {
@@ -161,6 +152,44 @@ resource "aws_iam_policy" "s3_bucket_read" {
 resource "aws_iam_role_policy_attachment" "lambda_s3_bucket_read" {
   role       = element(split("/", module.observe_s3_forwarder_lambda.lambda_function.role), 1)
   policy_arn = aws_iam_policy.s3_bucket_read.arn
+}
+
+# --------------------------------------------------
+# Dead Letter Queue for EventBridge Target
+# --------------------------------------------------
+resource "aws_sqs_queue" "eventbridge_dlq" {
+  name                      = "${local.resource_prefix}-eventbridge-dlq"
+  sqs_managed_sse_enabled   = true
+  message_retention_seconds = 604800 # 7 days
+}
+
+data "aws_iam_policy_document" "eventbridge_dlq_policy" {
+  statement {
+    sid    = "AllowEventBridgeToSendMessages"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    actions = [
+      "sqs:SendMessage"
+    ]
+
+    resources = [aws_sqs_queue.eventbridge_dlq.arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [local.account_id]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "eventbridge_dlq_policy" {
+  queue_url = aws_sqs_queue.eventbridge_dlq.id
+  policy    = data.aws_iam_policy_document.eventbridge_dlq_policy.json
 }
 
 # --------------------------------------------------
