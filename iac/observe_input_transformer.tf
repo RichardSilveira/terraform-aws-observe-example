@@ -1,5 +1,7 @@
 /*
-  This file configures XML to JSON transformation for S3 objects before forwarding to Observe.
+  🙋 Optional step to demonstrate some extension points may needed while integrating with Observe
+
+  🛠️ Converts source S3 xml objects to json
 
   Flow:
     S3 Bucket (files) -> EventBridge -> Input Transformer Lambda -> S3 Bucket (JSON files under "observe/" prefix) -> Observe
@@ -23,6 +25,7 @@ resource "null_resource" "lambda_dependencies" {
     source_code  = filemd5("${path.module}/../src/input_transformer/observe_input_transformer.py")
   }
 
+  # 🧑‍🏫 This step could be part of the CI/CD pipeline
   provisioner "local-exec" {
     command = <<EOF
 mkdir -p ${path.module}/builds/lambda_package

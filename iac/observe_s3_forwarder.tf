@@ -40,9 +40,9 @@ module "observe_s3_forwarder_lambda" {
 # the mock log storage bucket that is populated with sample log files.
 
 /* 🧙‍♂️ Observe recommends subscribe the Lambda directly in the S3 for the sake of simplicity,
-    but you can also use EventBridge rules, which is better for cross-account scenarios, plus,
-    in case you already have any event notification configured in the bucket, to avoid conflicts.
+      but this approach lacks flexibility in comparison to using EventBridge rules.
 */
+
 # module "observe_s3_bucket_subscription" {
 #   source  = "observeinc/lambda/aws//modules/s3_bucket_subscription"
 #   version = "3.6.0"

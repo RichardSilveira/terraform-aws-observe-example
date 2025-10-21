@@ -19,9 +19,7 @@ def lambda_handler(event, context):
     Transform XML files from S3 to JSON for Observe ingestion.
     Uses xmltodict for automatic XML->JSON conversion.
 
-    This function is designed to be triggered exclusively by EventBridge events
-    from S3 object creation. It extracts bucket and key information from the
-    EventBridge event detail and processes the file accordingly.
+    This could be used by any kind of source object transformation to one of the Observe' supported formats (json, text or parquet)
     """
     # EventBridge format - extract S3 details from detail section
     detail = event.get("detail", {})

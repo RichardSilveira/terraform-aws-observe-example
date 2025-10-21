@@ -23,8 +23,7 @@ iac/tfplan
 .DS_Store
 
 # General
-todos.txt
-notes.txt
+temp
 *.log
 .env
 .env.local
