@@ -125,8 +125,7 @@ EOF
 # to simulate real application logs that could be processed by Observe
 
 resource "aws_s3_bucket" "mock_log_storage" {
-  bucket = "${local.resource_prefix}-mock-log-storage"
-  # tags   = local.default_tags
+  bucket = "${local.resource_prefix}-mock-log-storage-s3"
 }
 
 resource "aws_s3_bucket_public_access_block" "mock_log_storage" {
@@ -138,42 +137,37 @@ resource "aws_s3_bucket_public_access_block" "mock_log_storage" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_notification" "mock_log_storage" {
+  bucket      = aws_s3_bucket.mock_log_storage.id
+  eventbridge = true
+}
+
 # Generate sample application log files
 resource "local_file" "sample_app_log" {
   content = templatefile("${path.module}/templates/sample_app.log.tpl", {
-    timestamp = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    timestamp = local.static_log_timestamp
     app_name  = "mock-web-app"
     region    = local.region
   })
   filename = "${path.module}/generated_logs/sample_app.log"
-
-  lifecycle {
-    ignore_changes = [content]
-  }
 }
 
 resource "local_file" "sample_error_log" {
   content = templatefile("${path.module}/templates/sample_error.log.tpl", {
-    timestamp = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    timestamp = local.static_log_timestamp
     app_name  = "mock-api-service"
     region    = local.region
   })
   filename = "${path.module}/generated_logs/sample_error.log"
-
-  lifecycle {
-    ignore_changes = [content]
-  }
 }
 
 resource "local_file" "sample_access_log" {
   content = templatefile("${path.module}/templates/sample_access.log.tpl", {
-    timestamp = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    timestamp = local.static_log_timestamp
+    app_name  = "mock-api-service"
+    region    = local.region
   })
   filename = "${path.module}/generated_logs/sample_access.log"
-
-  lifecycle {
-    ignore_changes = [content]
-  }
 }
 
 # Upload generated log files to S3
@@ -185,7 +179,7 @@ resource "aws_s3_object" "app_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key] # remove key if you want to generate new files
+    ignore_changes = [key, etag] # comment it if you want to update the files
   }
 }
 
@@ -197,7 +191,7 @@ resource "aws_s3_object" "error_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key] # remove key if you want to generate new files
+    ignore_changes = [key, etag] # comment it if you want to update the files
   }
 }
 
@@ -209,6 +203,6 @@ resource "aws_s3_object" "access_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key] # remove key if you want to generate new files
+    ignore_changes = [key, etag] # comment it if you want to update the files
   }
 }
