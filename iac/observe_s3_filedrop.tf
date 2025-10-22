@@ -12,40 +12,40 @@
 # --------------------------------------------------
 # IAM
 # --------------------------------------------------
-# resource "aws_iam_role" "observe_filedrop_role" {
-#   name = "observe-example-filedrop-role"
+resource "aws_iam_role" "observe_filedrop_role" {
+  name = "${local.resource_prefix}-observe-example-filedrop-role"
 
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#       {
-#         Effect    = "Allow",
-#         Principal = { Service = "lambda.${local.region}.amazonaws.com" },
-#         Action    = "sts:AssumeRole"
-#       }
-#     ]
-#   })
-# }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect    = "Allow",
+        Principal = { Service = "lambda.${local.region}.amazonaws.com" },
+        Action    = "sts:AssumeRole"
+      }
+    ]
+  })
+}
 
-# resource "aws_iam_role_policy" "observe_filedrop_role_policy" {
-#   name = "${local.resource_prefix}-filedrop-role-policy"
-#   role = aws_iam_role.observe_filedrop_role.id
-#   policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#       {
-#         Effect   = "Allow",
-#         Action   = "s3:PutObject",
-#         Resource = "*"
-#         Condition : {
-#           StringLike : {
-#             "s3:DataAccessPointArn" : var.observe_filedrop_access_point_arn
-#           }
-#         }
-#       }
-#     ]
-#   })
-# }
+resource "aws_iam_role_policy" "observe_filedrop_role_policy" {
+  name = "${local.resource_prefix}-filedrop-role-policy"
+  role = aws_iam_role.observe_filedrop_role.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "s3:PutObject",
+        Resource = "*"
+        Condition : {
+          StringLike : {
+            "s3:DataAccessPointArn" : var.observe_filedrop_access_point_arn
+          }
+        }
+      }
+    ]
+  })
+}
 
 # --------------------------------------------------
 # Observe Filedrop Forwarder

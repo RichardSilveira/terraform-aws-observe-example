@@ -7,6 +7,7 @@
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~>5.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | ~>2.4 |
 | <a name="requirement_observe"></a> [observe](#requirement\_observe) | ~>0.13 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | ~> 0.12 |
 
 ## Providers
 
@@ -16,6 +17,7 @@
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 5.100.0 |
 | <a name="provider_local"></a> [local](#provider\_local) | 2.5.3 |
 | <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
+| <a name="provider_time"></a> [time](#provider\_time) | 0.13.1 |
 
 ## Modules
 
@@ -42,9 +44,11 @@
 | [aws_iam_policy.input_transformer_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.s3_bucket_read](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.cwl_direct_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.observe_filedrop_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.observe_input_transformer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.cwl_direct_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy.observe_filedrop_role_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy.to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy_attachment.input_transformer_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.lambda_s3_bucket_read](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
@@ -79,6 +83,7 @@
 | [local_file.sample_error_log](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [local_file.sample_error_log_filedrop](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [null_resource.lambda_dependencies](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [time_sleep.wait_for_others](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [archive_file.mock_lambda_zip](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file) | data source |
 | [archive_file.observe_input_transformer](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |

@@ -19,7 +19,7 @@ def lambda_handler(event, context):
     Transform XML files from S3 to JSON for Observe ingestion.
     Uses xmltodict for automatic XML->JSON conversion.
 
-    This could be used by any kind of source object transformation to one of the Observe' supported formats (json, text or parquet)
+    This could be used by any kind of source object transformation to one of the Observe' supported formats (Parquet, JSON, CSV, or TEXT)
     """
     # EventBridge format - extract S3 details from detail section
     detail = event.get("detail", {})
@@ -33,38 +33,46 @@ def lambda_handler(event, context):
     bucket = bucket_name
     key = unquote_plus(object_key)
 
+    # Safety check: Skip if file is already in the observe/ prefix (prevent recursion)
+    if key.startswith(f"{OUTPUT_PREFIX}/"):
+        print(f"Skipping file already in {OUTPUT_PREFIX}/ prefix: s3://{bucket}/{key}")
+        return
+
     try:
         print(f"Processing s3://{bucket}/{key}")
 
-        # Download file and check if it's XML content
+        # Download file
         response = s3_client.get_object(Bucket=bucket, Key=key)
         content_type = response.get("ContentType", "")
+        file_content = response["Body"].read()
 
-        # Read content
-        file_content = response["Body"].read().decode("utf-8")
-
-        # Check if content is XML-like (either by content-type or by content inspection)
-        if not is_xml_content(file_content, content_type):
-            print(
-                f"Skipping non-XML file: s3://{bucket}/{key} (content-type: {content_type})"
-            )
-            return
-
-        # Convert XML to JSON
-        json_data = xmltodict.parse(file_content)
-
-        # Upload transformed file
         output_bucket = OUTPUT_BUCKET or bucket
-        output_key = build_output_key(key)
 
+        # Transform content if XML, otherwise keep as-is
+        decoded_content = file_content.decode("utf-8")
+        if is_xml_content(decoded_content, content_type):
+            # Convert XML to JSON
+            json_data = xmltodict.parse(decoded_content)
+            output_content = json.dumps(json_data, indent=2)
+            output_key = build_output_key(key, preserve_extension=False)
+            output_content_type = "application/json"
+            print(f"Transforming XML to JSON")
+        else:
+            # Keep file as-is
+            output_content = file_content
+            output_key = build_output_key(key, preserve_extension=True)
+            output_content_type = content_type or "application/octet-stream"
+            print(f"Non-XML file (content-type: {content_type}), copying as-is")
+
+        # Upload to S3
         s3_client.put_object(
             Bucket=output_bucket,
             Key=output_key,
-            Body=json.dumps(json_data, indent=2),
-            ContentType="application/json",
+            Body=output_content,
+            ContentType=output_content_type,
         )
 
-        print(f"✓ Transformed to s3://{output_bucket}/{output_key}")
+        print(f"Uploaded to s3://{output_bucket}/{output_key}")
 
         # Optionally delete source
         if DELETE_SOURCE:
@@ -97,15 +105,28 @@ def is_xml_content(content: str, content_type: str = "") -> bool:
     return False
 
 
-def build_output_key(input_key: str) -> str:
+def build_output_key(input_key: str, preserve_extension: bool = False) -> str:
     """Build output S3 key with configured prefix."""
-    filename = input_key.split("/")[-1]
+    # Preserve directory structure from input key
+    path_parts = input_key.split("/")
+    filename = path_parts[-1]
+    subdirs = "/".join(path_parts[:-1]) if len(path_parts) > 1 else ""
 
-    # Ensure .json extension
-    if not filename.endswith(".json"):
+    # Handle extension
+    if not preserve_extension and not filename.endswith(".json"):
         filename = filename.rsplit(".", 1)[0] + ".json"
 
-    return f"{OUTPUT_PREFIX}/{filename}" if OUTPUT_PREFIX else filename
+    # Build output key with prefix and subdirectories
+    if OUTPUT_PREFIX:
+        if subdirs:
+            return f"{OUTPUT_PREFIX}/{subdirs}/{filename}"
+        return f"{OUTPUT_PREFIX}/{filename}"
+
+    return (
+        input_key
+        if preserve_extension
+        else f"{subdirs}/{filename}" if subdirs else filename
+    )
 
 
 # For local testing

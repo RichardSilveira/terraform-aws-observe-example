@@ -86,12 +86,15 @@ resource "aws_lambda_function" "observe_input_transformer" {
 # --------------------------------------------------
 resource "aws_cloudwatch_event_rule" "file_created_for_transform" {
   name        = "${local.resource_prefix}-file-created-to-transform"
-  description = "Route file creation events to the input transformer lambda"
+  description = "Route file creation events to the input transformer lambda (excludes observe/ prefix)"
   event_pattern = jsonencode({
     "source" : ["aws.s3"],
     "detail-type" : ["Object Created"],
     "detail" : {
-      "bucket" : { "name" : ["${aws_s3_bucket.mock_log_storage.bucket}"] }
+      "bucket" : { "name" : ["${aws_s3_bucket.mock_log_storage.bucket}"] },
+      "object" : {
+        "key" : [{ "anything-but" : { "prefix" : "observe/" } }]
+      }
     }
   })
 }
