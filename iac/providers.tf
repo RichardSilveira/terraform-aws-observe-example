@@ -38,6 +38,23 @@ provider "aws" {
   }
 }
 
+# Source account provider for cross-account CloudWatch Logs subscription
+provider "aws" {
+  region  = var.source_account_region
+  profile = var.source_account_profile
+  alias   = "source_account"
+
+  default_tags {
+    tags = {
+      Owner            = var.owner
+      CostCenter       = var.cost_center
+      Project          = var.project
+      Environment      = var.environment
+      "user:CreatedBy" = var.created_by
+    }
+  }
+}
+
 # provider "aws" {
 #   region  = "us-west-2"
 #   alias   = "us_west_2" # Needed for Observe Filedrop free tier accounts

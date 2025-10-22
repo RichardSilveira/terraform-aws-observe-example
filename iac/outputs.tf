@@ -115,3 +115,20 @@ output "enabled_interface_endpoint_services" {
   value       = module.networking.enabled_interface_endpoint_services
 }
 
+# --------------------------------------------------
+# Cross-Account Source Account Outputs (Optional)
+# --------------------------------------------------
+output "source_account_lambda_function_name" {
+  description = "Name of the mock Lambda function in the source account"
+  value       = var.source_account_profile != null ? aws_lambda_function.source_mock_lambda.function_name : null
+}
+
+output "source_account_lambda_log_group_name" {
+  description = "Name of the CloudWatch Log Group for the source account Lambda"
+  value       = var.source_account_profile != null ? aws_cloudwatch_log_group.source_mock_lambda.name : null
+}
+
+output "source_account_id" {
+  description = "AWS Account ID of the source account"
+  value       = var.source_account_profile != null ? data.aws_caller_identity.source_account.account_id : null
+}
