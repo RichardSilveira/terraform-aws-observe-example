@@ -179,7 +179,7 @@ resource "aws_s3_object" "app_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key, etag] # comment it if you want to update the files
+    # ignore_changes = [key, etag] # comment it if you want to update the files
   }
 
   depends_on = [time_sleep.wait_for_others]
@@ -193,7 +193,7 @@ resource "aws_s3_object" "error_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key, etag] # comment it if you want to update the files
+    # ignore_changes = [key, etag] # comment it if you want to update the files
   }
 
   depends_on = [time_sleep.wait_for_others]
@@ -207,7 +207,7 @@ resource "aws_s3_object" "access_log" {
   tags   = local.default_tags
 
   lifecycle {
-    ignore_changes = [key, etag] # comment it if you want to update the files
+    # ignore_changes = [key, etag] # comment it if you want to update the files
   }
 
   depends_on = [time_sleep.wait_for_others]

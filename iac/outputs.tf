@@ -31,6 +31,21 @@ output "observe_s3_forwarder_lambda_name" {
   value       = module.observe_s3_forwarder_lambda.lambda_function.function_name
 }
 
+output "observe_metric_stream_name" {
+  description = "Name of the CloudWatch Metric Stream for Lambda metrics"
+  value       = aws_cloudwatch_metric_stream.lambda_metrics.name
+}
+
+output "observe_metric_stream_arn" {
+  description = "ARN of the CloudWatch Metric Stream for Lambda metrics"
+  value       = aws_cloudwatch_metric_stream.lambda_metrics.arn
+}
+
+output "observe_metric_stream_state" {
+  description = "State of the CloudWatch Metric Stream (running or stopped)"
+  value       = aws_cloudwatch_metric_stream.lambda_metrics.state
+}
+
 # --------------------------------------------------
 # Mock Resources Outputs
 # --------------------------------------------------

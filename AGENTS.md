@@ -1,5 +1,17 @@
 # .github/agents.md
 
+I'm building a Integration with the Observe Platform
+
+This repository demonstrate how to forwards data a single source account so far, from Cloudwatch logs then via Firhose forwards logs to Observe via http endpoint.
+
+Another example is how to forward S3 objects to Observe, for S3 that stores logs, and using a Lambda that is provided by the Observe platform via terraform code we can use (we install their modules)
+
+I have some mock terraform files that creates the S3 and Lambdas for testing to sort of mimic the client existing resources that needs to be integrated with Observe.
+
+Take a look around inside the `iac` folder to understand our project.
+
+For every new request keep in mind that most of the resources will likely be already created
+
 ## default
 
 When working with infrastructure code:
