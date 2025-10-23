@@ -72,3 +72,24 @@ variable "observe_filedrop_bucket_prefix" {
   type        = string
   default     = ""
 }
+
+# --------------------------------------------------
+# Cross-Account Source Variables
+# --------------------------------------------------
+variable "source_account_profile" {
+  description = "AWS CLI profile for the source account (where logs originate)"
+  type        = string
+  default     = null
+}
+
+variable "source_account_region" {
+  description = "AWS region for the source account"
+  type        = string
+  default     = null
+}
+
+variable "cross_account_org_paths" {
+  description = "List of AWS Organization paths allowed to send logs to the destination (e.g., ['o-abc123/*'])"
+  type        = list(string)
+  default     = []
+}

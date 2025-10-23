@@ -6,7 +6,9 @@
   scenario you can point a subscription filter directly at the Firehose delivery
   stream ARN and do NOT need a destination.
 
-  Left enabled here for reference; remove or comment out if not required.
+  This destination is configured to accept logs from other AWS accounts and
+  forward them to the Kinesis Firehose delivery stream, which then sends the
+  logs to Observe.
  */
 
 
@@ -48,6 +50,11 @@ resource "aws_iam_role_policy" "to_firehose" {
   })
 }
 
+# CloudWatch Logs Destination Policy
+# This policy determines which AWS accounts/principals can create subscription filters
+# to this destination. When cross_account_org_paths is provided, it restricts access
+# to specific AWS Organization paths. Otherwise, it allows access from any account
+# (which should be further restricted in production).
 resource "aws_cloudwatch_log_destination_policy" "to_firehose" {
   destination_name = aws_cloudwatch_log_destination.to_firehose.name
   access_policy = jsonencode({
@@ -59,11 +66,14 @@ resource "aws_cloudwatch_log_destination_policy" "to_firehose" {
       },
       Action   = "logs:PutSubscriptionFilter",
       Resource = aws_cloudwatch_log_destination.to_firehose.arn
-      Condition : {
+      # If cross_account_org_paths is provided, restrict access to those org paths
+      # Otherwise, allow from any account (should be restricted in production)
+      Condition = length(var.cross_account_org_paths) > 0 ? {
         "ForAnyValue:StringLike" : {
-          "aws:PrincipalOrgPaths" : ["o-ywdmny0x30/r-hf6b/o-ywdmny0x30/*"]
+          "aws:PrincipalOrgPaths" : var.cross_account_org_paths
         }
-      }
+      } : null
     }]
   })
 }
+

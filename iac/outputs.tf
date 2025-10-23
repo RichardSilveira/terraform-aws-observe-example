@@ -31,6 +31,21 @@ output "observe_s3_forwarder_lambda_name" {
   value       = module.observe_s3_forwarder_lambda.lambda_function.function_name
 }
 
+output "observe_metric_stream_name" {
+  description = "Name of the CloudWatch Metric Stream for Lambda metrics"
+  value       = aws_cloudwatch_metric_stream.lambda_metrics.name
+}
+
+output "observe_metric_stream_arn" {
+  description = "ARN of the CloudWatch Metric Stream for Lambda metrics"
+  value       = aws_cloudwatch_metric_stream.lambda_metrics.arn
+}
+
+output "observe_metric_stream_state" {
+  description = "State of the CloudWatch Metric Stream (running or stopped)"
+  value       = aws_cloudwatch_metric_stream.lambda_metrics.state
+}
+
 # --------------------------------------------------
 # Mock Resources Outputs
 # --------------------------------------------------
@@ -115,3 +130,20 @@ output "enabled_interface_endpoint_services" {
   value       = module.networking.enabled_interface_endpoint_services
 }
 
+# --------------------------------------------------
+# Cross-Account Source Account Outputs (Optional)
+# --------------------------------------------------
+output "source_account_lambda_function_name" {
+  description = "Name of the mock Lambda function in the source account"
+  value       = var.source_account_profile != null ? aws_lambda_function.source_mock_lambda.function_name : null
+}
+
+output "source_account_lambda_log_group_name" {
+  description = "Name of the CloudWatch Log Group for the source account Lambda"
+  value       = var.source_account_profile != null ? aws_cloudwatch_log_group.source_mock_lambda.name : null
+}
+
+output "source_account_id" {
+  description = "AWS Account ID of the source account"
+  value       = var.source_account_profile != null ? data.aws_caller_identity.source_account.account_id : null
+}

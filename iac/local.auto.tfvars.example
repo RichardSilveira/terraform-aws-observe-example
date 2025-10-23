@@ -26,3 +26,11 @@ observe_token               = "<your_observe_token>"
 observe_filedrop_access_point_arn = "TBD"
 observe_filedrop_bucket        = "TBD"
 observe_filedrop_bucket_prefix = "TBD"
+
+# -------------------------------------------------------------------
+# Cross-Account Source Configuration (Optional)
+# -------------------------------------------------------------------
+# Uncomment these variables if you want to test cross-account CloudWatch Logs forwarding
+# source_account_profile = "<source_account_profile_name>"
+# source_account_region  = "<source_account_region>" # Optional, defaults to aws_region if not specified
+# cross_account_org_paths = ["o-yourorgid/r-rootid/o-yourorgid/*"] # Optional, AWS Organization paths allowed to send logs

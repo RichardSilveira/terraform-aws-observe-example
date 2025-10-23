@@ -63,6 +63,8 @@ resource "aws_s3_object" "app_log_filedrop" {
   lifecycle {
     ignore_changes = [key, etag] # comment it if you want to update the files
   }
+
+  depends_on = [time_sleep.wait_for_others]
 }
 
 resource "aws_s3_object" "error_log_filedrop" {
@@ -75,6 +77,8 @@ resource "aws_s3_object" "error_log_filedrop" {
   lifecycle {
     ignore_changes = [key, etag] # comment it if you want to update the files
   }
+
+  depends_on = [time_sleep.wait_for_others]
 }
 
 resource "aws_s3_object" "access_log_filedrop" {
@@ -87,4 +91,6 @@ resource "aws_s3_object" "access_log_filedrop" {
   lifecycle {
     ignore_changes = [key, etag] # comment it if you want to update the files
   }
+
+  depends_on = [time_sleep.wait_for_others]
 }
