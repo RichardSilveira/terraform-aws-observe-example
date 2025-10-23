@@ -9,6 +9,13 @@
     - Only streams AWS/Lambda namespace metrics to control costs
     - Metrics include: Invocations, Errors, Duration, Throttles, ConcurrentExecutions, etc.
     - Format is JSON (OpenTelemetry 1.0.0 compatible)
+
+  Important:
+    - This is for same-account forwarding of Lambda metrics to Observe.
+    - If you need cross-account forwarding, a way more complex additional setup is required
+      as CloudWatch Metric Streams do not support cross-account destinations natively
+      (it can NOT target a CWL Destination like CWL can - only Firehose directly in the same account).
+
  */
 
 # --------------------------------------------------

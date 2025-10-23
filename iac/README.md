@@ -41,18 +41,22 @@
 | [aws_cloudwatch_log_destination.to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_destination) | resource |
 | [aws_cloudwatch_log_destination_policy.to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_destination_policy) | resource |
 | [aws_cloudwatch_log_group.firehose_cwl](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cloudwatch_log_group.metric_stream](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_cloudwatch_log_group.source_mock_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_cloudwatch_log_subscription_filter.mock_lambda_to_observe](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_subscription_filter) | resource |
 | [aws_cloudwatch_log_subscription_filter.source_to_destination](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_subscription_filter) | resource |
+| [aws_cloudwatch_metric_stream.lambda_metrics](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_stream) | resource |
 | [aws_iam_policy.input_transformer_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.s3_bucket_read](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.cwl_direct_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.metric_stream_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.observe_filedrop_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.observe_input_transformer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.source_cwl_subscription](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.source_mock_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.cwl_direct_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy.metric_stream_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy.observe_filedrop_role_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy.source_cwl_subscription](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy.to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
@@ -144,6 +148,9 @@
 | <a name="output_observe_cloudwatch_destination_name"></a> [observe\_cloudwatch\_destination\_name](#output\_observe\_cloudwatch\_destination\_name) | Name of the CloudWatch Logs destination for Observe |
 | <a name="output_observe_firehose_arn"></a> [observe\_firehose\_arn](#output\_observe\_firehose\_arn) | ARN of the Observe Kinesis Firehose delivery stream |
 | <a name="output_observe_firehose_name"></a> [observe\_firehose\_name](#output\_observe\_firehose\_name) | Name of the Observe Kinesis Firehose delivery stream |
+| <a name="output_observe_metric_stream_arn"></a> [observe\_metric\_stream\_arn](#output\_observe\_metric\_stream\_arn) | ARN of the CloudWatch Metric Stream for Lambda metrics |
+| <a name="output_observe_metric_stream_name"></a> [observe\_metric\_stream\_name](#output\_observe\_metric\_stream\_name) | Name of the CloudWatch Metric Stream for Lambda metrics |
+| <a name="output_observe_metric_stream_state"></a> [observe\_metric\_stream\_state](#output\_observe\_metric\_stream\_state) | State of the CloudWatch Metric Stream (running or stopped) |
 | <a name="output_observe_s3_backup_bucket"></a> [observe\_s3\_backup\_bucket](#output\_observe\_s3\_backup\_bucket) | S3 bucket used for Observe Firehose failed events backup |
 | <a name="output_observe_s3_forwarder_lambda_name"></a> [observe\_s3\_forwarder\_lambda\_name](#output\_observe\_s3\_forwarder\_lambda\_name) | Name of the Observe S3 forwarder Lambda function |
 | <a name="output_private_subnet_ids"></a> [private\_subnet\_ids](#output\_private\_subnet\_ids) | The IDs of the private subnets |
