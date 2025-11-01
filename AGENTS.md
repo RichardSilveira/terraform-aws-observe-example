@@ -1,12 +1,16 @@
 # .github/agents.md
 
-I'm building a Integration with the Observe Platform
+This repository demonstrates how to forward AWS data into Observe Platform leveraging Terraform from multiple sources:
 
-This repository demonstrate how to forwards data a single source account so far, from Cloudwatch logs then via Firhose forwards logs to Observe via http endpoint.
+- Cloudwatch Logs: via subscription filter to Firehose, then via http forward the logs to Observe.
 
-Another example is how to forward S3 objects to Observe, for S3 that stores logs, and using a Lambda that is provided by the Observe platform via terraform code we can use (we install their modules)
+- S3 Simplified version:  via S3 bucket event ingestion integrated with eventbridge which the "Observe Lambda Forwarder" as a target (Lambda created leveraging Observe Terraform modules)
 
-I have some mock terraform files that creates the S3 and Lambdas for testing to sort of mimic the client existing resources that needs to be integrated with Observe.
+- S3 Cost-optimized version also know as "Filedrop": Similar to the Simplified version, but leveraging the "filedrop" Observe approach which creates a different Lambda and puts some Dead Letter Queues, plus leverage batch processing for cost-optimization and forward S3 objects over aws network backbone directly the to S3 bucket access point in the Observe AWS Account.
+
+- Cross Account scenario for CloudWatch Logs: via subscription filter to the CW Log Destionation in the destionation account that integrates with Firehose also in the destionation account to forward logs to Observe via http.
+
+It also contains mock terraform files that creates the S3 and Lambdas for testing to sort of mimic the client existing resources that needs to be integrated with Observe.
 
 Take a look around inside the `iac` folder to understand our project.
 
