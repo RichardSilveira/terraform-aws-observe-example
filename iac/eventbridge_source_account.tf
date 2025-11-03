@@ -16,14 +16,130 @@
 # Source Account EventBridge Event Bus
 # --------------------------------------------------
 
+# Event bus with logging enabled for troubleshooting (not required for production-grade setup)
 resource "aws_cloudwatch_event_bus" "source_partner_events" {
   provider = aws.source_account
   name     = "${local.resource_prefix}-source-partner-events"
+
+  log_config {
+    level          = "INFO"
+    include_detail = "FULL"
+  }
 
   tags = {
     Name = "${local.resource_prefix}-source-partner-events"
   }
 }
+
+# EventBridge Archive for troubleshooting (not required for production-grade setup)
+resource "aws_cloudwatch_event_archive" "source_partner_events" {
+  provider         = aws.source_account
+  name             = "${local.resource_prefix}-source-partner-archive"
+  event_source_arn = aws_cloudwatch_event_bus.source_partner_events.arn
+  retention_days   = 7
+
+  event_pattern = jsonencode({
+    source = [{
+      prefix = "simulate.aws.partner/genesys.com/"
+    }]
+  })
+
+  description = "Archive for troubleshooting source partner events - captures events for 7 days replay"
+}
+
+# --------------------------------------------------
+# CloudWatch Logs for EventBridge (for troubleshooting - not required for production-grade setup)
+# --------------------------------------------------
+
+# CloudWatch Log Group to receive EventBridge logs
+resource "aws_cloudwatch_log_group" "source_eventbus_logs" {
+  provider          = aws.source_account
+  name              = "/aws/vendedlogs/events/event-bus/${local.resource_prefix}-source-partner-events"
+  retention_in_days = 7
+
+  tags = {
+    Name = "${local.resource_prefix}-source-partner-events-logs"
+  }
+}
+
+# Log delivery source for INFO logs
+resource "aws_cloudwatch_log_delivery_source" "source_info_logs" {
+  provider     = aws.source_account
+  name         = "EventBusSource-${local.resource_prefix}-source-INFO"
+  log_type     = "INFO_LOGS"
+  resource_arn = aws_cloudwatch_event_bus.source_partner_events.arn
+}
+
+# Log delivery source for ERROR logs
+resource "aws_cloudwatch_log_delivery_source" "source_error_logs" {
+  provider     = aws.source_account
+  name         = "EventBusSource-${local.resource_prefix}-source-ERROR"
+  log_type     = "ERROR_LOGS"
+  resource_arn = aws_cloudwatch_event_bus.source_partner_events.arn
+}
+
+# Log delivery destination (CloudWatch Logs)
+resource "aws_cloudwatch_log_delivery_destination" "source_cwlogs" {
+  provider = aws.source_account
+  name     = "EventsDestination-${local.resource_prefix}-source-CWLogs"
+
+  delivery_destination_configuration {
+    destination_resource_arn = aws_cloudwatch_log_group.source_eventbus_logs.arn
+  }
+}
+
+# Resource policy to allow log delivery service to write to log group
+resource "aws_cloudwatch_log_resource_policy" "source_eventbus" {
+  provider    = aws.source_account
+  policy_name = "AWSLogDeliveryWrite-${local.resource_prefix}-source"
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.source_eventbus_logs.arn}:log-stream:*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.source_account.account_id
+          }
+          ArnLike = {
+            "aws:SourceArn" = [
+              aws_cloudwatch_log_delivery_source.source_info_logs.arn,
+              aws_cloudwatch_log_delivery_source.source_error_logs.arn
+            ]
+          }
+        }
+      }
+    ]
+  })
+}
+
+# Link INFO logs to destination
+resource "aws_cloudwatch_log_delivery" "source_info_logs" {
+  provider                 = aws.source_account
+  delivery_destination_arn = aws_cloudwatch_log_delivery_destination.source_cwlogs.arn
+  delivery_source_name     = aws_cloudwatch_log_delivery_source.source_info_logs.name
+}
+
+# Link ERROR logs to destination
+resource "aws_cloudwatch_log_delivery" "source_error_logs" {
+  provider                 = aws.source_account
+  delivery_destination_arn = aws_cloudwatch_log_delivery_destination.source_cwlogs.arn
+  delivery_source_name     = aws_cloudwatch_log_delivery_source.source_error_logs.name
+
+  depends_on = [aws_cloudwatch_log_delivery.source_info_logs]
+}
+
+# --------------------------------------------------
+# Source Account EventBridge Rule
+# --------------------------------------------------
 
 resource "aws_cloudwatch_event_rule" "source_partner_to_destination" {
   provider       = aws.source_account

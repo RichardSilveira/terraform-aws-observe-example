@@ -15,13 +15,106 @@
 # Destination Account EventBridge Event Bus
 # --------------------------------------------------
 
+# Event bus with logging enabled for troubleshooting (not required for production-grade setup)
 resource "aws_cloudwatch_event_bus" "destination_partner_events" {
   name = "${local.resource_prefix}-destination-partner-events"
+
+  log_config {
+    level          = "INFO"
+    include_detail = "FULL"
+  }
 
   tags = {
     Name = "${local.resource_prefix}-destination-partner-events"
   }
 }
+
+# --------------------------------------------------
+# CloudWatch Logs for EventBridge (for troubleshooting - not required for production-grade setup)
+# --------------------------------------------------
+
+# CloudWatch Log Group to receive EventBridge logs
+resource "aws_cloudwatch_log_group" "destination_eventbus_logs" {
+  name              = "/aws/vendedlogs/events/event-bus/${local.resource_prefix}-destination-partner-events"
+  retention_in_days = 7
+
+  tags = {
+    Name = "${local.resource_prefix}-destination-partner-events-logs"
+  }
+}
+
+# Log delivery source for INFO logs
+resource "aws_cloudwatch_log_delivery_source" "destination_info_logs" {
+  name         = "EventBusSource-${local.resource_prefix}-destination-INFO"
+  log_type     = "INFO_LOGS"
+  resource_arn = aws_cloudwatch_event_bus.destination_partner_events.arn
+}
+
+# Log delivery source for ERROR logs
+resource "aws_cloudwatch_log_delivery_source" "destination_error_logs" {
+  name         = "EventBusSource-${local.resource_prefix}-destination-ERROR"
+  log_type     = "ERROR_LOGS"
+  resource_arn = aws_cloudwatch_event_bus.destination_partner_events.arn
+}
+
+# Log delivery destination (CloudWatch Logs)
+resource "aws_cloudwatch_log_delivery_destination" "destination_cwlogs" {
+  name = "EventsDestination-${local.resource_prefix}-destination-CWLogs"
+
+  delivery_destination_configuration {
+    destination_resource_arn = aws_cloudwatch_log_group.destination_eventbus_logs.arn
+  }
+}
+
+# Resource policy to allow log delivery service to write to log group
+resource "aws_cloudwatch_log_resource_policy" "destination_eventbus" {
+  policy_name = "AWSLogDeliveryWrite-${local.resource_prefix}-destination"
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.destination_eventbus_logs.arn}:log-stream:*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+          ArnLike = {
+            "aws:SourceArn" = [
+              aws_cloudwatch_log_delivery_source.destination_info_logs.arn,
+              aws_cloudwatch_log_delivery_source.destination_error_logs.arn
+            ]
+          }
+        }
+      }
+    ]
+  })
+}
+
+# Link INFO logs to destination
+resource "aws_cloudwatch_log_delivery" "destination_info_logs" {
+  delivery_destination_arn = aws_cloudwatch_log_delivery_destination.destination_cwlogs.arn
+  delivery_source_name     = aws_cloudwatch_log_delivery_source.destination_info_logs.name
+}
+
+# Link ERROR logs to destination
+resource "aws_cloudwatch_log_delivery" "destination_error_logs" {
+  delivery_destination_arn = aws_cloudwatch_log_delivery_destination.destination_cwlogs.arn
+  delivery_source_name     = aws_cloudwatch_log_delivery_source.destination_error_logs.name
+
+  depends_on = [aws_cloudwatch_log_delivery.destination_info_logs]
+}
+
+# --------------------------------------------------
+# Destination Account EventBridge Resource Policy
+# --------------------------------------------------
 
 resource "aws_cloudwatch_event_bus_policy" "allow_source_account" {
   event_bus_name = aws_cloudwatch_event_bus.destination_partner_events.name
@@ -38,8 +131,8 @@ resource "aws_cloudwatch_event_bus_policy" "allow_source_account" {
         Action   = "events:PutEvents",
         Resource = aws_cloudwatch_event_bus.destination_partner_events.arn,
         Condition = {
-          StringEquals = {
-            "events:source" = ["simulate.aws.partner/genesys.com"]
+          StringLike = {
+            "events:source" = ["simulate.aws.partner/genesys.com/*"]
           }
         }
       }

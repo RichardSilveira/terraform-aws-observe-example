@@ -123,43 +123,6 @@ This implementation uses **both resource-based policies and IAM roles**:
 
 AWS now requires IAM roles for all new cross-account event bus targets created after March 2, 2023. This ensures organization boundaries using Service Control Policies (SCPs) can be properly applied to control who can send and receive events across accounts.
 
-## Testing
-
-To test the cross-account event bus communication:
-
-1. **Send a test event to the source event bus**:
-
-```bash
-aws events put-events \
-  --entries '[{
-    "Source": "simulate.aws.partner/genesys.com",
-    "DetailType": "Genesys Cloud Event",
-    "Detail": "{\"eventId\": \"test-123\", \"type\": \"conversation.start\"}",
-    "EventBusName": "observe-example-dev-source-partner-events"
-  }]' \
-  --profile <source-account-profile>
-```
-
-2. **Verify the event was forwarded to the destination account**:
-
-```bash
-# Check Firehose delivery metrics in destination account
-aws cloudwatch get-metric-statistics \
-  --namespace AWS/Firehose \
-  --metric-name IncomingRecords \
-  --dimensions Name=DeliveryStreamName,Value=observe-example-dev-observe-firehose \
-  --start-time $(date -u -d '5 minutes ago' +%Y-%m-%dT%H:%M:%S) \
-  --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
-  --period 300 \
-  --statistics Sum \
-  --profile <destination-account-profile>
-
-# Or check CloudWatch Logs for Firehose delivery logs
-aws logs tail /aws/firehose/observe-example-dev-observe-firehose-cwl \
-  --follow \
-  --profile <destination-account-profile>
-```
-
 ## Integration with Observe
 
 The partner events are forwarded **directly to Kinesis Firehose** in the destination account, which then delivers them to the Observe platform via HTTP endpoint. This provides:
@@ -178,37 +141,6 @@ The configuration reuses the existing `observe_kinesis_firehose` module already 
 - `eventbridge_destination_account.tf` - Destination account EventBridge resources and policies
 - `outputs.tf` - Outputs for event bus ARNs, names, and log groups
 
-## Outputs
-
-The configuration provides the following outputs:
-
-- `source_eventbridge_bus_name` - Name of the source event bus
-- `source_eventbridge_bus_arn` - ARN of the source event bus
-- `source_eventbridge_rule_name` - Name of the source forwarding rule
-- `destination_eventbridge_bus_name` - Name of the destination event bus
-- `destination_eventbridge_bus_arn` - ARN of the destination event bus
-- `destination_eventbridge_target_firehose_arn` - ARN of the Kinesis Firehose delivery stream
-
-## Prerequisites
-
-- Two AWS accounts configured with appropriate profiles
-- Source account profile configured in `variables.tf` (`source_account_profile`)
-- Proper AWS credentials and permissions in both accounts
-- EventBridge quota limits verified in both accounts
-
-## Deployment
-
-The resources will be created when running:
-
-```bash
-cd iac
-terraform init
-terraform plan -out=tfplan
-terraform apply tfplan
-```
-
-Terraform will automatically handle the creation order using `depends_on` to ensure the destination event bus and policy are created before the source account target.
-
 ## Cost Considerations
 
 - **EventBridge Custom Event Bus**: No charge for custom event buses
@@ -225,13 +157,6 @@ Terraform will automatically handle the creation order using `depends_on` to ens
 3. **Auth0 Events**: Authentication and authorization events
 4. **DataDog Events**: Monitoring and alerting events
 5. **New Relic Events**: Application performance events
-
-## Limitations
-
-- Cross-account event delivery only works within the same AWS region
-- Event buses must be in the same partition (aws, aws-cn, aws-us-gov)
-- EventBridge has a maximum event size of 256 KB
-- Rate limits apply per account (default: 10,000 events/sec)
 
 ## References
 
