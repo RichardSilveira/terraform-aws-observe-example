@@ -4,7 +4,7 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_archive"></a> [archive](#requirement\_archive) | ~>2.4 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~>5.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~>6.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | ~>2.4 |
 | <a name="requirement_observe"></a> [observe](#requirement\_observe) | ~>0.13 |
 | <a name="requirement_time"></a> [time](#requirement\_time) | ~> 0.12 |
@@ -14,8 +14,8 @@
 | Name | Version |
 |------|---------|
 | <a name="provider_archive"></a> [archive](#provider\_archive) | 2.7.1 |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.100.0 |
-| <a name="provider_aws.source_account"></a> [aws.source\_account](#provider\_aws.source\_account) | 5.100.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.19.0 |
+| <a name="provider_aws.source_account"></a> [aws.source\_account](#provider\_aws.source\_account) | 6.19.0 |
 | <a name="provider_local"></a> [local](#provider\_local) | 2.5.3 |
 | <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
 | <a name="provider_time"></a> [time](#provider\_time) | 0.13.1 |
@@ -34,21 +34,45 @@
 
 | Name | Type |
 |------|------|
+| [aws_cloudwatch_event_archive.source_partner_events](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_archive) | resource |
+| [aws_cloudwatch_event_bus.destination_partner_events](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_bus) | resource |
+| [aws_cloudwatch_event_bus.source_partner_events](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_bus) | resource |
+| [aws_cloudwatch_event_bus_policy.allow_source_account](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_bus_policy) | resource |
+| [aws_cloudwatch_event_rule.destination_partner_events](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule) | resource |
 | [aws_cloudwatch_event_rule.file_created_for_transform](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule) | resource |
 | [aws_cloudwatch_event_rule.s3_object_created](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule) | resource |
+| [aws_cloudwatch_event_rule.source_partner_to_destination](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule) | resource |
+| [aws_cloudwatch_event_target.destination_event_bus](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
+| [aws_cloudwatch_event_target.partner_events_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
 | [aws_cloudwatch_event_target.to_input_transformer_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
 | [aws_cloudwatch_event_target.to_observe_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
+| [aws_cloudwatch_log_delivery.destination_error_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_delivery) | resource |
+| [aws_cloudwatch_log_delivery.destination_info_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_delivery) | resource |
+| [aws_cloudwatch_log_delivery.source_error_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_delivery) | resource |
+| [aws_cloudwatch_log_delivery.source_info_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_delivery) | resource |
+| [aws_cloudwatch_log_delivery_destination.destination_cwlogs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_delivery_destination) | resource |
+| [aws_cloudwatch_log_delivery_destination.source_cwlogs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_delivery_destination) | resource |
+| [aws_cloudwatch_log_delivery_source.destination_error_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_delivery_source) | resource |
+| [aws_cloudwatch_log_delivery_source.destination_info_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_delivery_source) | resource |
+| [aws_cloudwatch_log_delivery_source.source_error_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_delivery_source) | resource |
+| [aws_cloudwatch_log_delivery_source.source_info_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_delivery_source) | resource |
 | [aws_cloudwatch_log_destination.to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_destination) | resource |
 | [aws_cloudwatch_log_destination_policy.to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_destination_policy) | resource |
+| [aws_cloudwatch_log_group.destination_eventbus_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_cloudwatch_log_group.firehose_cwl](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_cloudwatch_log_group.metric_stream](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cloudwatch_log_group.source_eventbus_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_cloudwatch_log_group.source_mock_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cloudwatch_log_resource_policy.destination_eventbus](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_resource_policy) | resource |
+| [aws_cloudwatch_log_resource_policy.source_eventbus](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_resource_policy) | resource |
 | [aws_cloudwatch_log_subscription_filter.mock_lambda_to_observe](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_subscription_filter) | resource |
 | [aws_cloudwatch_log_subscription_filter.source_to_destination](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_subscription_filter) | resource |
 | [aws_cloudwatch_metric_stream.lambda_metrics](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_stream) | resource |
 | [aws_iam_policy.input_transformer_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.s3_bucket_read](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.cwl_direct_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.eventbridge_cross_account](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.eventbridge_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.metric_stream_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.observe_filedrop_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.observe_input_transformer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
@@ -56,6 +80,8 @@
 | [aws_iam_role.source_mock_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.cwl_direct_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy.eventbridge_cross_account](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy.eventbridge_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy.metric_stream_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy.observe_filedrop_role_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy.source_cwl_subscription](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
@@ -95,6 +121,7 @@
 | [local_file.sample_error_log](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [local_file.sample_error_log_filedrop](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [null_resource.lambda_dependencies](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [time_sleep.wait_for_eventbus_policy](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [time_sleep.wait_for_iam_role_propagation](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [time_sleep.wait_for_others](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [archive_file.mock_lambda_zip](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file) | data source |
@@ -133,6 +160,9 @@
 
 | Name | Description |
 |------|-------------|
+| <a name="output_destination_eventbridge_bus_arn"></a> [destination\_eventbridge\_bus\_arn](#output\_destination\_eventbridge\_bus\_arn) | ARN of the EventBridge event bus in the destination account |
+| <a name="output_destination_eventbridge_bus_name"></a> [destination\_eventbridge\_bus\_name](#output\_destination\_eventbridge\_bus\_name) | Name of the EventBridge event bus in the destination account |
+| <a name="output_destination_eventbridge_target_firehose_arn"></a> [destination\_eventbridge\_target\_firehose\_arn](#output\_destination\_eventbridge\_target\_firehose\_arn) | ARN of the Kinesis Firehose used as target for partner events in the destination account |
 | <a name="output_enabled_interface_endpoint_services"></a> [enabled\_interface\_endpoint\_services](#output\_enabled\_interface\_endpoint\_services) | List of enabled interface endpoint services |
 | <a name="output_interface_endpoint_details"></a> [interface\_endpoint\_details](#output\_interface\_endpoint\_details) | Detailed information about all interface endpoints |
 | <a name="output_interface_endpoint_dns_names"></a> [interface\_endpoint\_dns\_names](#output\_interface\_endpoint\_dns\_names) | Map of interface endpoint DNS names by service |
@@ -158,6 +188,9 @@
 | <a name="output_source_account_id"></a> [source\_account\_id](#output\_source\_account\_id) | AWS Account ID of the source account |
 | <a name="output_source_account_lambda_function_name"></a> [source\_account\_lambda\_function\_name](#output\_source\_account\_lambda\_function\_name) | Name of the mock Lambda function in the source account |
 | <a name="output_source_account_lambda_log_group_name"></a> [source\_account\_lambda\_log\_group\_name](#output\_source\_account\_lambda\_log\_group\_name) | Name of the CloudWatch Log Group for the source account Lambda |
+| <a name="output_source_eventbridge_bus_arn"></a> [source\_eventbridge\_bus\_arn](#output\_source\_eventbridge\_bus\_arn) | ARN of the EventBridge event bus in the source account |
+| <a name="output_source_eventbridge_bus_name"></a> [source\_eventbridge\_bus\_name](#output\_source\_eventbridge\_bus\_name) | Name of the EventBridge event bus in the source account |
+| <a name="output_source_eventbridge_rule_name"></a> [source\_eventbridge\_rule\_name](#output\_source\_eventbridge\_rule\_name) | Name of the EventBridge rule in the source account |
 | <a name="output_vpc_cidr_block"></a> [vpc\_cidr\_block](#output\_vpc\_cidr\_block) | The CIDR block of the VPC |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC |
 <!-- END_TF_DOCS -->

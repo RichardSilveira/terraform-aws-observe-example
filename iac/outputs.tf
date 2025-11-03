@@ -147,3 +147,36 @@ output "source_account_id" {
   description = "AWS Account ID of the source account"
   value       = var.source_account_profile != null ? data.aws_caller_identity.source_account.account_id : null
 }
+
+# --------------------------------------------------
+# Cross-Account EventBridge Outputs
+# --------------------------------------------------
+output "source_eventbridge_bus_name" {
+  description = "Name of the EventBridge event bus in the source account"
+  value       = var.source_account_profile != null ? aws_cloudwatch_event_bus.source_partner_events.name : null
+}
+
+output "source_eventbridge_bus_arn" {
+  description = "ARN of the EventBridge event bus in the source account"
+  value       = var.source_account_profile != null ? aws_cloudwatch_event_bus.source_partner_events.arn : null
+}
+
+output "source_eventbridge_rule_name" {
+  description = "Name of the EventBridge rule in the source account"
+  value       = var.source_account_profile != null ? aws_cloudwatch_event_rule.source_partner_to_destination.name : null
+}
+
+output "destination_eventbridge_bus_name" {
+  description = "Name of the EventBridge event bus in the destination account"
+  value       = aws_cloudwatch_event_bus.destination_partner_events.name
+}
+
+output "destination_eventbridge_bus_arn" {
+  description = "ARN of the EventBridge event bus in the destination account"
+  value       = aws_cloudwatch_event_bus.destination_partner_events.arn
+}
+
+output "destination_eventbridge_target_firehose_arn" {
+  description = "ARN of the Kinesis Firehose used as target for partner events in the destination account"
+  value       = module.observe_kinesis_firehose.firehose_delivery_stream.arn
+}

@@ -11,6 +11,7 @@
     "terraform validate": true,
     "terraform plan": true,
     "rm": true,
+    "tee": true,
     "awk": true,
     "print": true,
     "find": true,
